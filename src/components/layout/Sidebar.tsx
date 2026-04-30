@@ -27,9 +27,13 @@ const NAV: NavGroup[] = [
   },
   {
     section: 'GROW',
-    defaultOpen: false,
+    defaultOpen: true,
     items: [
-      { label: 'Overview',  icon: Sprout,  to: '/grow' },
+      { label: 'Overview',         icon: Sprout,    to: '/grow' },
+      { label: 'Budz · Overview',  icon: LayoutDashboard, to: '/grow/budz' },
+      { label: 'Budz · Leads',     icon: Users,     to: '/grow/budz/leads' },
+      { label: 'Budz · Drafts',    icon: BarChart3, to: '/grow/budz/drafts' },
+      { label: 'Budz · Sends',     icon: Zap,       to: '/grow/budz/sends' },
     ],
   },
   {

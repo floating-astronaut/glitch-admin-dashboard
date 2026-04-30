@@ -21,6 +21,10 @@ import TradeNews from './pages/trade/News'
 
 // Grow vertical
 import GrowOverview from './pages/grow/Overview'
+import BudzOverview from './pages/grow/budz/Overview'
+import BudzLeads    from './pages/grow/budz/Leads'
+import BudzDrafts   from './pages/grow/budz/Drafts'
+import BudzSends    from './pages/grow/budz/Sends'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -51,8 +55,12 @@ export default function App() {
           <Route path="trade/oracle"   element={<TradeOracle />} />
           <Route path="trade/news"     element={<TradeNews />} />
 
-          {/* Grow vertical (placeholder) */}
-          <Route path="grow"           element={<GrowOverview />} />
+          {/* Grow vertical */}
+          <Route path="grow"              element={<GrowOverview />} />
+          <Route path="grow/budz"         element={<BudzOverview />} />
+          <Route path="grow/budz/leads"   element={<BudzLeads />} />
+          <Route path="grow/budz/drafts"  element={<BudzDrafts />} />
+          <Route path="grow/budz/sends"   element={<BudzSends />} />
 
           {/* Admin (cross-cutting) */}
           <Route path="clients"        element={<Clients />} />
