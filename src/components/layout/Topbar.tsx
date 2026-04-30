@@ -14,7 +14,7 @@ export default function Topbar({ title }: Props) {
 
   const handleLogout = () => {
     logout()
-    window.location.href = 'https://glitchexecutor.com'
+    navigate('/login', { replace: true })
   }
 
   return (

@@ -127,7 +127,7 @@ export default function Infrastructure() {
             onChange={e => setLogService(e.target.value)}
             className="bg-g-deep border border-g-border rounded-lg px-3 py-2 text-sm text-g-text focus:outline-none focus:border-accent/50"
           >
-            {['payment', 'ensemble', 'telegram-bot', 'executor', 'postgres', 'redis', 'admin-api'].map(s => (
+            {['payment', 'admin-api', 'dashboard', 'postgres', 'redis', 'docker-proxy'].map(s => (
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
