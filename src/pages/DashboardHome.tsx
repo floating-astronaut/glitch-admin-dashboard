@@ -6,13 +6,32 @@ import DataTable, { Column } from '../components/ui/DataTable'
 import StatusBadge from '../components/ui/StatusBadge'
 import {
   Users, DollarSign, Bot, Activity, Mail,
-  TrendingUp, AlertCircle, ArrowRight, Zap,
+  AlertCircle, ArrowRight, BarChart3, Wallet, Zap,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
+interface Kpis {
+  total_customers: number
+  active_customers: number
+  by_tier: Record<string, number>
+  mrr_usd: number
+  arr_usd: number
+  email_signups: number
+  query_cost_today_usd: number
+  trade_engine: { status: string; age_sec: number | null }
+  trades_open: number
+  trades_today: number
+  signals_today: number
+  account_equity: number
+}
+
+function fmtMoney(n: number, dp = 2) {
+  return `$${n.toLocaleString(undefined, { minimumFractionDigits: dp, maximumFractionDigits: dp })}`
+}
+
 export default function DashboardHome() {
   const navigate = useNavigate()
-  const { data: kpis, isLoading: kpisLoading } = useQuery({
+  const { data: kpis, isLoading: kpisLoading } = useQuery<Kpis>({
     queryKey: ['kpis'],
     queryFn: getKpis,
     refetchInterval: 30_000,
@@ -25,25 +44,32 @@ export default function DashboardHome() {
   const { data: activity = [], isLoading: actLoading } = useQuery({
     queryKey: ['activity'],
     queryFn: getActivity,
-    refetchInterval: 30_000,
+    refetchInterval: 15_000,
   })
 
   const activityCols: Column<any>[] = [
     { key: 'type', label: 'Type', render: r => (
       <span className="text-xs font-mono text-g-muted">{r.type}</span>
     )},
-    { key: 'customer', label: 'Source' },
-    { key: 'symbol', label: 'Symbol', render: r => r.symbol || '—' },
-    { key: 'action', label: 'Action' },
+    { key: 'customer', label: 'Source', render: r => (
+      <span className="capitalize text-white">{r.customer}</span>
+    )},
+    { key: 'symbol', label: 'Symbol', render: r => (
+      <span className="font-mono text-xs text-g-text">{r.symbol || '—'}</span>
+    )},
+    { key: 'action', label: 'Action', render: r => (
+      <span className="text-xs text-g-muted">{r.action}</span>
+    )},
     { key: 'created_at', label: 'Time', render: r => r.created_at
       ? formatDistanceToNow(new Date(r.created_at), { addSuffix: true })
       : '—'
     },
   ]
 
+  const teStatus = kpis?.trade_engine?.status ?? 'unknown'
+
   return (
     <div className="space-y-6">
-      {/* Alerts */}
       {alerts.length > 0 && (
         <div className="space-y-2">
           {alerts.map((alert: any, i: number) => (
@@ -59,60 +85,67 @@ export default function DashboardHome() {
         </div>
       )}
 
-      {/* Primary KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          label="Total Customers"
+          label="Trade Engine"
+          value={kpisLoading ? '…' : teStatus}
+          icon={Bot}
+          accent={teStatus === 'healthy'}
+          sub={kpis?.trade_engine?.age_sec != null
+            ? `last signal ${kpis.trade_engine.age_sec}s ago`
+            : '—'}
+          trend={teStatus === 'healthy' ? 'up' : teStatus === 'stale' ? 'neutral' : 'down'}
+        />
+        <KpiCard
+          label="Account Equity"
+          value={kpisLoading ? '…' : fmtMoney(kpis?.account_equity ?? 0)}
+          icon={Wallet}
+          sub={`${kpis?.trades_open ?? 0} open positions`}
+        />
+        <KpiCard
+          label="Customers"
           value={kpisLoading ? '…' : kpis?.total_customers ?? 0}
           icon={Users}
           sub={`${kpis?.active_customers ?? 0} active`}
         />
         <KpiCard
           label="MRR"
-          value={kpisLoading ? '…' : `$${(kpis?.mrr_usd ?? 0).toLocaleString()}`}
+          value={kpisLoading ? '…' : fmtMoney(kpis?.mrr_usd ?? 0, 0)}
           icon={DollarSign}
           accent
-          sub={`ARR $${((kpis?.arr_usd ?? 0)).toLocaleString()}`}
+          sub={`ARR ${fmtMoney(kpis?.arr_usd ?? 0, 0)}`}
           trend="up"
-        />
-        <KpiCard
-          label="Auto-Execute Users"
-          value={kpisLoading ? '…' : kpis?.auto_execute_users ?? 0}
-          icon={Bot}
-          sub={`${kpis?.strong_signal_notify_users ?? 0} strong signal notify`}
-        />
-        <KpiCard
-          label="Ensemble"
-          value={kpisLoading ? '…' : kpis?.ensemble_status ?? '—'}
-          icon={Activity}
         />
       </div>
 
-      {/* Secondary KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          label="Auto-Exec Trades Today"
-          value={kpisLoading ? '…' : kpis?.auto_execute_trades_today ?? 0}
-          icon={TrendingUp}
+          label="Trades Today"
+          value={kpisLoading ? '…' : kpis?.trades_today ?? 0}
+          icon={BarChart3}
         />
         <KpiCard
-          label="Query Cost Today"
-          value={kpisLoading ? '…' : `$${(kpis?.query_cost_today_usd ?? 0).toFixed(4)}`}
-          icon={DollarSign}
+          label="Signals Today"
+          value={kpisLoading ? '…' : (kpis?.signals_today ?? 0).toLocaleString()}
+          icon={Zap}
         />
         <KpiCard
           label="Email Signups"
           value={kpisLoading ? '…' : kpis?.email_signups ?? 0}
           icon={Mail}
         />
+        <KpiCard
+          label="Query Cost Today"
+          value={kpisLoading ? '…' : `$${(kpis?.query_cost_today_usd ?? 0).toFixed(4)}`}
+          icon={DollarSign}
+        />
       </div>
 
-      {/* Tier breakdown */}
-      {kpis?.by_tier && (
+      {kpis?.by_tier && Object.keys(kpis.by_tier).length > 0 && (
         <div className="bg-g-card border border-g-border rounded-xl p-4">
           <h2 className="text-sm font-semibold text-white mb-3">Customers by Tier</h2>
           <div className="flex gap-4 flex-wrap">
-            {Object.entries(kpis.by_tier).map(([tier, count]: [string, any]) => (
+            {Object.entries(kpis.by_tier).map(([tier, count]) => (
               <div key={tier} className="flex items-center gap-2">
                 <StatusBadge value={tier} />
                 <span className="text-sm font-medium text-white">{count}</span>
@@ -122,12 +155,11 @@ export default function DashboardHome() {
         </div>
       )}
 
-      {/* Quick actions */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Manage Clients', to: '/clients', icon: Users },
-          { label: 'AI Signals & Trades', to: '/signals', icon: Zap },
-          { label: 'Billing Overview', to: '/billing', icon: DollarSign },
+          { label: 'Trade Overview', to: '/trade',    icon: Activity },
+          { label: 'Customers',      to: '/clients',  icon: Users },
+          { label: 'Billing',        to: '/billing',  icon: DollarSign },
         ].map(({ label, to, icon: Icon }) => (
           <button
             key={to}
@@ -143,7 +175,6 @@ export default function DashboardHome() {
         ))}
       </div>
 
-      {/* Recent activity */}
       <div>
         <h2 className="text-sm font-semibold text-white mb-3">Recent Activity</h2>
         <DataTable
