@@ -1,21 +1,38 @@
 import { Outlet, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
+import { useAuthStore } from '../../stores/auth'
+import { useWebSocket } from '../../hooks/useWebSocket'
 
 const PAGE_TITLES: Record<string, string> = {
-  '/': 'Dashboard',
-  '/trading': 'Trading & Bots',
-  '/clients': 'Clients',
-  '/billing': 'Billing',
-  '/infrastructure': 'Infrastructure',
-  '/settings': 'Settings',
-  '/analytics': 'AI Analytics',
+  '/':                'Admin Home',
+  '/trade':           'Trade · Overview',
+  '/trade/bots':      'Trade · Bots',
+  '/trade/signals':   'Trade · Signals',
+  '/trade/trades':    'Trade · Trades',
+  '/trade/oracle':    'Trade · Oracle',
+  '/trade/news':      'Trade · News',
+  '/grow':            'Grow',
+  '/clients':         'Customers',
+  '/billing':         'Billing',
+  '/infrastructure':  'Infrastructure',
+  '/settings':        'Settings',
+  '/admin/control-centre': 'Admin · Control Centre',
+  '/admin/users':          'Admin · User Management',
 }
 
 export default function Layout() {
   const { pathname } = useLocation()
+  const { token } = useAuthStore()
+  // Mount the WS hook for live invalidations (no-op if no token).
+  useWebSocket()
+
+  useEffect(() => { void token /* dependency anchor for hook lifecycle */ }, [token])
+
+  const exact = PAGE_TITLES[pathname]
   const base = '/' + pathname.split('/')[1]
-  const title = PAGE_TITLES[base] || PAGE_TITLES[pathname] || 'Admin'
+  const title = exact || PAGE_TITLES[base] || 'Admin'
 
   return (
     <div className="flex h-screen bg-g-bg overflow-hidden">
