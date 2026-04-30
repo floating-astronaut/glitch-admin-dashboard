@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { tradeTrades, tradeBots } from '../../api/trade'
 import { format } from 'date-fns'
-import { ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react'
+import { BarChart3 } from 'lucide-react'
 import clsx from 'clsx'
+import { TableToolbar, Pagination } from '../../components/ui/TableToolbar'
 
 const STATUS = [
   { label: 'All',    value: '' },
@@ -28,22 +29,26 @@ function SidePill({ side }: { side: string }) {
 export default function TradeTrades() {
   const [status, setStatus] = useState<'' | 'open' | 'closed'>('')
   const [bot, setBot] = useState('')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [pageSize, setPageSize] = useState(20)
   const [page, setPage] = useState(1)
-  const limit = 50
 
   const { data: bots = [] } = useQuery({ queryKey: ['trade:bots'], queryFn: tradeBots })
   const { data, isLoading } = useQuery({
-    queryKey: ['trade:trades', { status, bot, page }],
+    queryKey: ['trade:trades', { status, bot, dateFrom, dateTo, page, pageSize }],
     queryFn: () => tradeTrades({
       status: (status || undefined) as any,
       bot: bot || undefined,
+      date_from: dateFrom || undefined,
+      date_to: dateTo || undefined,
       page,
-      limit,
+      limit: pageSize,
     }),
     refetchInterval: 15_000,
   })
 
-  const totalPages = data ? Math.max(1, Math.ceil(data.total / limit)) : 1
+  const totalPages = data ? Math.max(1, Math.ceil(data.total / pageSize)) : 1
 
   return (
     <div className="space-y-4">
@@ -51,7 +56,14 @@ export default function TradeTrades() {
         <BarChart3 size={14} className="text-accent" /> Trades
       </h2>
 
-      <div className="flex flex-wrap gap-3 items-center">
+      <TableToolbar
+        dateFrom={dateFrom} dateTo={dateTo}
+        onDateFromChange={v => { setDateFrom(v); setPage(1) }}
+        onDateToChange={v => { setDateTo(v); setPage(1) }}
+        pageSize={pageSize}
+        onPageSizeChange={n => { setPageSize(n); setPage(1) }}
+        total={data?.total}
+      >
         <div className="flex gap-1 bg-g-card border border-g-border rounded-lg p-0.5">
           {STATUS.map(s => (
             <button
@@ -74,10 +86,7 @@ export default function TradeTrades() {
           <option value="">All bots</option>
           {bots.map(b => <option key={b.bot} value={b.bot}>{b.bot}</option>)}
         </select>
-        <span className="text-xs text-g-muted ml-auto">
-          {data ? `${data.total} matching` : '—'}
-        </span>
-      </div>
+      </TableToolbar>
 
       <div className="overflow-x-auto rounded-xl border border-g-border">
         <table className="w-full text-sm">
@@ -119,27 +128,7 @@ export default function TradeTrades() {
         </table>
       </div>
 
-      {data && data.total > limit && (
-        <div className="flex items-center justify-between text-xs text-g-muted">
-          <span>Page {page} of {totalPages}</span>
-          <div className="flex gap-1">
-            <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="px-2 py-1 rounded border border-g-border disabled:opacity-30 hover:enabled:bg-g-deep"
-            >
-              <ChevronLeft size={12} />
-            </button>
-            <button
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="px-2 py-1 rounded border border-g-border disabled:opacity-30 hover:enabled:bg-g-deep"
-            >
-              <ChevronRight size={12} />
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   )
 }

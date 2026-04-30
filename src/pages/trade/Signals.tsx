@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { tradeSignals, tradeBots } from '../../api/trade'
-import { formatDistanceToNow } from 'date-fns'
-import { ChevronLeft, ChevronRight, Zap } from 'lucide-react'
+import { format, formatDistanceToNow } from 'date-fns'
+import { Zap } from 'lucide-react'
 import clsx from 'clsx'
+import { TableToolbar, Pagination } from '../../components/ui/TableToolbar'
 
 const VOTES = [
   { label: 'All',  value: '' },
@@ -24,23 +25,27 @@ export default function TradeSignals() {
   const [bot, setBot] = useState('')
   const [vote, setVote] = useState('')
   const [executed, setExecuted] = useState<'all' | 'true' | 'false'>('all')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [pageSize, setPageSize] = useState(20)
   const [page, setPage] = useState(1)
-  const limit = 50
 
   const { data: bots = [] } = useQuery({ queryKey: ['trade:bots'], queryFn: tradeBots })
   const { data, isLoading } = useQuery({
-    queryKey: ['trade:signals', { bot, vote, executed, page }],
+    queryKey: ['trade:signals', { bot, vote, executed, dateFrom, dateTo, page, pageSize }],
     queryFn: () => tradeSignals({
       bot: bot || undefined,
       vote: (vote || undefined) as any,
       executed: executed === 'all' ? undefined : executed === 'true',
+      date_from: dateFrom || undefined,
+      date_to: dateTo || undefined,
       page,
-      limit,
+      limit: pageSize,
     }),
     refetchInterval: 10_000,
   })
 
-  const totalPages = data ? Math.max(1, Math.ceil(data.total / limit)) : 1
+  const totalPages = data ? Math.max(1, Math.ceil(data.total / pageSize)) : 1
 
   return (
     <div className="space-y-4">
@@ -48,8 +53,14 @@ export default function TradeSignals() {
         <Zap size={14} className="text-accent" /> Signals
       </h2>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center">
+      <TableToolbar
+        dateFrom={dateFrom} dateTo={dateTo}
+        onDateFromChange={v => { setDateFrom(v); setPage(1) }}
+        onDateToChange={v => { setDateTo(v); setPage(1) }}
+        pageSize={pageSize}
+        onPageSizeChange={n => { setPageSize(n); setPage(1) }}
+        total={data?.total}
+      >
         <select
           value={bot}
           onChange={e => { setBot(e.target.value); setPage(1) }}
@@ -83,13 +94,8 @@ export default function TradeSignals() {
           <option value="true">Executed</option>
           <option value="false">Not executed</option>
         </select>
+      </TableToolbar>
 
-        <span className="text-xs text-g-muted ml-auto">
-          {data ? `${data.total.toLocaleString()} matching` : '—'}
-        </span>
-      </div>
-
-      {/* Table */}
       <div className="overflow-x-auto rounded-xl border border-g-border">
         <table className="w-full text-sm">
           <thead>
@@ -108,7 +114,7 @@ export default function TradeSignals() {
               <tr><td colSpan={9} className="text-center py-8 text-g-muted">No signals match the filters</td></tr>
             ) : data.rows.map(s => (
               <tr key={s.id} className="border-b border-g-border/50 hover:bg-white/2">
-                <td className="px-3 py-2 text-xs text-g-muted whitespace-nowrap">
+                <td className="px-3 py-2 text-xs text-g-muted whitespace-nowrap" title={format(new Date(s.created_at), 'PPpp')}>
                   {formatDistanceToNow(new Date(s.created_at), { addSuffix: true })}
                 </td>
                 <td className="px-3 py-2 text-xs text-white capitalize">{s.bot_name}</td>
@@ -131,28 +137,7 @@ export default function TradeSignals() {
         </table>
       </div>
 
-      {/* Pagination */}
-      {data && data.total > limit && (
-        <div className="flex items-center justify-between text-xs text-g-muted">
-          <span>Page {page} of {totalPages}</span>
-          <div className="flex gap-1">
-            <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="px-2 py-1 rounded border border-g-border disabled:opacity-30 hover:enabled:bg-g-deep"
-            >
-              <ChevronLeft size={12} />
-            </button>
-            <button
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="px-2 py-1 rounded border border-g-border disabled:opacity-30 hover:enabled:bg-g-deep"
-            >
-              <ChevronRight size={12} />
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   )
 }

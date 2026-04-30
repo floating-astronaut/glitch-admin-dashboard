@@ -154,39 +154,43 @@ export const tradeBots = () =>
 export const tradeStats = (days: number = 7) =>
   api.get<TradeStats>('/api/trade/stats', { params: { days } }).then(r => r.data)
 
+interface DateRange { date_from?: string; date_to?: string }
+
 export const tradeSignals = (params: {
   bot?: string; symbol?: string; vote?: 'BUY' | 'SELL' | 'HOLD';
   executed?: boolean; limit?: number; page?: number
-} = {}) =>
+} & DateRange = {}) =>
   api.get<Page<TradeSignal>>('/api/trade/signals', { params }).then(r => r.data)
 
 export const tradeTrades = (params: {
   status?: 'open' | 'closed'; bot?: string; symbol?: string;
   limit?: number; page?: number
-} = {}) =>
+} & DateRange = {}) =>
   api.get<Page<TradeRow>>('/api/trade/trades', { params }).then(r => r.data)
 
 export const tradeSymbols = () =>
   api.get<SymbolBreakdown[]>('/api/trade/symbols').then(r => r.data)
 
 export const tradeOracleDecisions = (params: {
-  symbol?: string; decision?: string; mode?: string; limit?: number
-} = {}) =>
-  api.get<OracleDecision[]>('/api/trade/oracle/decisions', { params }).then(r => r.data)
+  symbol?: string; decision?: string; mode?: string; limit?: number; page?: number
+} & DateRange = {}) =>
+  api.get<Page<OracleDecision>>('/api/trade/oracle/decisions', { params }).then(r => r.data)
 
 export const tradeOracleWeights = () =>
   api.get<OracleWeight[]>('/api/trade/oracle/weights').then(r => r.data)
 
 export const tradeOracleBlocks = (params: {
-  bot?: string; symbol?: string; limit?: number
-} = {}) =>
-  api.get<OracleBlock[]>('/api/trade/oracle/blocks', { params }).then(r => r.data)
+  bot?: string; symbol?: string; limit?: number; page?: number
+} & DateRange = {}) =>
+  api.get<Page<OracleBlock>>('/api/trade/oracle/blocks', { params }).then(r => r.data)
 
 export const tradeOracleRisk = () =>
   api.get<OracleRiskLimit[]>('/api/trade/oracle/risk').then(r => r.data)
 
-export const tradeNews = (limit = 50) =>
-  api.get<NewsEvent[]>('/api/trade/news', { params: { limit } }).then(r => r.data)
+export const tradeNews = (params: {
+  limit?: number; page?: number
+} & DateRange = {}) =>
+  api.get<Page<NewsEvent>>('/api/trade/news', { params }).then(r => r.data)
 
 export const tradeBars = (symbol: string, timeframe: string, limit = 500) =>
   api.get(`/api/trade/bars/${symbol}/${timeframe}`, { params: { limit } }).then(r => r.data)

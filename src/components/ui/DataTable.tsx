@@ -19,9 +19,11 @@ interface Props<T> {
   defaultPageSize?: number
 }
 
+const PAGE_SIZE_OPTIONS = [20, 50, 100]
+
 export default function DataTable<T extends Record<string, any>>({
   columns, data, keyField = 'id', loading, emptyText = 'No data', className,
-  dateField, defaultPageSize = 10,
+  dateField, defaultPageSize = 20,
 }: Props<T>) {
   const [pageSize, setPageSize] = useState(defaultPageSize)
   const [currentPage, setCurrentPage] = useState(1)
@@ -123,9 +125,9 @@ export default function DataTable<T extends Record<string, any>>({
             onChange={e => setPageSize(Number(e.target.value))}
             className="bg-g-deep border border-g-border rounded px-2 py-1 text-g-text text-xs focus:outline-none focus:border-accent"
           >
-            <option value={10}>10</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
+            {PAGE_SIZE_OPTIONS.map(n => (
+              <option key={n} value={n}>{n}</option>
+            ))}
           </select>
         </div>
       </div>

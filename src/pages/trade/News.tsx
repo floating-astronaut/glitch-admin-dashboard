@@ -1,16 +1,28 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Newspaper, ExternalLink } from 'lucide-react'
 import { tradeNews } from '../../api/trade'
 import { format, formatDistanceToNow } from 'date-fns'
+import { TableToolbar, Pagination } from '../../components/ui/TableToolbar'
 
 export default function TradeNews() {
-  const { data = [], isLoading } = useQuery({
-    queryKey: ['trade:news'],
-    queryFn: () => tradeNews(100),
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [pageSize, setPageSize] = useState(20)
+  const [page, setPage] = useState(1)
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['trade:news', { dateFrom, dateTo, page, pageSize }],
+    queryFn: () => tradeNews({
+      date_from: dateFrom || undefined,
+      date_to: dateTo || undefined,
+      page,
+      limit: pageSize,
+    }),
     refetchInterval: 60_000,
   })
 
-  if (isLoading) return <div className="text-g-muted">Loading…</div>
+  const totalPages = data ? Math.max(1, Math.ceil(data.total / pageSize)) : 1
 
   return (
     <div className="space-y-4">
@@ -18,11 +30,21 @@ export default function TradeNews() {
         <Newspaper size={14} className="text-accent" /> News Events
       </h2>
 
+      <TableToolbar
+        dateFrom={dateFrom} dateTo={dateTo}
+        onDateFromChange={v => { setDateFrom(v); setPage(1) }}
+        onDateToChange={v => { setDateTo(v); setPage(1) }}
+        pageSize={pageSize}
+        onPageSizeChange={n => { setPageSize(n); setPage(1) }}
+        total={data?.total}
+      />
+
       <div className="space-y-2">
-        {data.length === 0 && (
-          <div className="text-g-muted text-sm">No news events</div>
+        {isLoading && <div className="text-g-muted text-sm">Loading…</div>}
+        {!isLoading && data && data.rows.length === 0 && (
+          <div className="text-g-muted text-sm">No news events match the date range</div>
         )}
-        {data.map(n => {
+        {data?.rows.map(n => {
           const when = n.published_at || n.created_at
           return (
             <div key={n.id} className="rounded-xl border border-g-border bg-g-card p-4 hover:border-accent/30 transition-colors">
@@ -73,6 +95,8 @@ export default function TradeNews() {
           )
         })}
       </div>
+
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   )
 }
