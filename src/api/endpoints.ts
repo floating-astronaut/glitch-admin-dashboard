@@ -53,8 +53,8 @@ export const getBillingSummary = () =>
 export const getPlans = () =>
   api.get('/api/billing/plans').then(r => r.data)
 
-export const getEmailSignups = (page = 1) =>
-  api.get(`/api/billing/email-signups?page=${page}`).then(r => r.data)
+export const getEmailSignups = (page = 1, limit = 20, date_from?: string, date_to?: string) =>
+  api.get('/api/billing/email-signups', { params: { page, limit, date_from, date_to } }).then(r => r.data)
 
 // Infrastructure
 export const getServices = () =>
@@ -76,8 +76,8 @@ export const createAdminUser = (data: { email: string; password: string; role: s
 export const updateAdminUser = (id: number, data: { role?: string; is_active?: boolean }) =>
   api.put(`/api/settings/users/${id}`, data).then(r => r.data)
 
-export const getAuditLog = (page = 1) =>
-  api.get(`/api/settings/audit?page=${page}`).then(r => r.data)
+export const getAuditLog = (page = 1, limit = 20, date_from?: string, date_to?: string) =>
+  api.get('/api/settings/audit', { params: { page, limit, date_from, date_to } }).then(r => r.data)
 
 export const getEnvStatus = () =>
   api.get('/api/settings/env-status').then(r => r.data)

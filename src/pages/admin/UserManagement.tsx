@@ -9,6 +9,7 @@ import {
   ChevronLeft, ChevronRight, Plus, Check, X, Ban,
 } from 'lucide-react'
 import clsx from 'clsx'
+import { TableToolbar, Pagination } from '../../components/ui/TableToolbar'
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 function exportCsv(rows: any[]) {
@@ -91,20 +92,27 @@ function BulkBar({
 // ── Customers tab ─────────────────────────────────────────────────────────────
 function CustomersTab() {
   const [page, setPage]       = useState(1)
+  const [pageSize, setPageSize] = useState(20)
   const [search, setSearch]   = useState('')
   const [q, setQ]             = useState('')
   const [tier, setTier]       = useState('')
   const [status, setStatus]   = useState('')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo]     = useState('')
   const [selected, setSelected] = useState<Set<number>>(new Set())
 
   const { data, isLoading } = useQuery({
-    queryKey: ['admin:customers', page, q, tier, status],
-    queryFn: () => getAdminCustomers({ page, limit: 25, search: q, tier, status }),
+    queryKey: ['admin:customers', { page, pageSize, q, tier, status, dateFrom, dateTo }],
+    queryFn: () => getAdminCustomers({
+      page, limit: pageSize, search: q, tier, status,
+      date_from: dateFrom || undefined,
+      date_to: dateTo || undefined,
+    }),
     keepPreviousData: true,
   } as any)
 
   const customers: any[] = (data as any)?.customers || []
-  const totalPages = Math.ceil(((data as any)?.total || 0) / 25)
+  const totalPages = Math.max(1, Math.ceil(((data as any)?.total || 0) / pageSize))
 
   const toggleAll = () =>
     setSelected(selected.size === customers.length
@@ -120,40 +128,46 @@ function CustomersTab() {
 
   return (
     <div className="space-y-3">
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-1 flex-1 min-w-48">
+      <TableToolbar
+        dateFrom={dateFrom} dateTo={dateTo}
+        onDateFromChange={v => { setDateFrom(v); setPage(1) }}
+        onDateToChange={v => { setDateTo(v); setPage(1) }}
+        pageSize={pageSize}
+        onPageSizeChange={n => { setPageSize(n); setPage(1) }}
+        total={(data as any)?.total}
+      >
+        <div className="flex items-center gap-1">
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') { setQ(search); setPage(1) } }}
             placeholder="Search username / ID / Stripe…"
-            className="w-full text-xs bg-g-deep border border-g-border rounded-lg px-3 py-2 text-g-text placeholder:text-g-dim focus:outline-none focus:border-accent/50"
+            className="text-xs bg-g-deep border border-g-border rounded-lg px-3 py-1.5 text-g-text placeholder:text-g-dim focus:outline-none focus:border-accent/50"
           />
           <button
             onClick={() => { setQ(search); setPage(1) }}
-            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-g-muted hover:text-white transition-colors"
+            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-g-muted hover:text-white transition-colors"
           >
             <Search size={13} />
           </button>
         </div>
         <select value={tier} onChange={e => { setTier(e.target.value); setPage(1) }}
-          className="text-xs bg-g-deep border border-g-border rounded-lg px-2 py-2 text-g-text">
+          className="text-xs bg-g-deep border border-g-border rounded px-2 py-1.5 text-g-text">
           <option value="">All tiers</option>
           {TIERS.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
         <select value={status} onChange={e => { setStatus(e.target.value); setPage(1) }}
-          className="text-xs bg-g-deep border border-g-border rounded-lg px-2 py-2 text-g-text">
+          className="text-xs bg-g-deep border border-g-border rounded px-2 py-1.5 text-g-text">
           <option value="">All statuses</option>
           {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
         <button
           onClick={() => exportCsv(customers)}
-          className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg bg-white/5 text-g-muted hover:text-white hover:bg-white/10 transition-colors"
+          className="flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg bg-white/5 text-g-muted hover:text-white hover:bg-white/10 transition-colors"
         >
           <Download size={12} /> Export Page
         </button>
-      </div>
+      </TableToolbar>
 
       <BulkBar selected={selected} rows={customers} onClear={() => setSelected(new Set())} />
 
@@ -212,17 +226,8 @@ function CustomersTab() {
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between px-4 py-3 border-t border-g-border">
-          <span className="text-xs text-g-dim">{(data as any)?.total ?? 0} total · Page {page} of {Math.max(1, totalPages)}</span>
-          <div className="flex gap-1">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-1 rounded text-g-muted hover:text-white disabled:opacity-30">
-              <ChevronLeft size={14} />
-            </button>
-            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="p-1 rounded text-g-muted hover:text-white disabled:opacity-30">
-              <ChevronRight size={14} />
-            </button>
-          </div>
+        <div className="px-4 py-3 border-t border-g-border">
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
         </div>
       </div>
     </div>
@@ -361,16 +366,30 @@ function AdminUsersTab() {
 // ── Audit log tab ─────────────────────────────────────────────────────────────
 function AuditTab() {
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+
   const { data, isLoading } = useQuery({
-    queryKey: ['admin:audit', page],
-    queryFn: () => getAuditLog(page),
+    queryKey: ['admin:audit', { page, pageSize, dateFrom, dateTo }],
+    queryFn: () => getAuditLog(page, pageSize, dateFrom || undefined, dateTo || undefined),
     keepPreviousData: true,
   } as any)
 
-  const entries: any[] = (data as any)?.entries || (data as any) || []
-  const totalPages = (data as any)?.pages || 1
+  const entries: any[] = (data as any)?.entries || []
+  const total = (data as any)?.total ?? 0
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
   return (
+    <div className="space-y-3">
+      <TableToolbar
+        dateFrom={dateFrom} dateTo={dateTo}
+        onDateFromChange={v => { setDateFrom(v); setPage(1) }}
+        onDateToChange={v => { setDateTo(v); setPage(1) }}
+        pageSize={pageSize}
+        onPageSizeChange={n => { setPageSize(n); setPage(1) }}
+        total={total}
+      />
     <div className="rounded-xl border border-g-border bg-g-card overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -404,19 +423,10 @@ function AuditTab() {
           </tbody>
         </table>
       </div>
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-g-border">
-          <span className="text-xs text-g-dim">Page {page} of {totalPages}</span>
-          <div className="flex gap-1">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-1 rounded text-g-muted hover:text-white disabled:opacity-30">
-              <ChevronLeft size={14} />
-            </button>
-            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="p-1 rounded text-g-muted hover:text-white disabled:opacity-30">
-              <ChevronRight size={14} />
-            </button>
-          </div>
-        </div>
-      )}
+      <div className="px-4 py-3 border-t border-g-border">
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+      </div>
+    </div>
     </div>
   )
 }

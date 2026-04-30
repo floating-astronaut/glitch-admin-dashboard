@@ -1,14 +1,26 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getBillingSummary, getPlans, getEmailSignups } from '../api/endpoints'
 import KpiCard from '../components/ui/KpiCard'
 import DataTable, { Column } from '../components/ui/DataTable'
+import { TableToolbar, Pagination } from '../components/ui/TableToolbar'
 import { DollarSign, Users, Mail, TrendingUp } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
 export default function Billing() {
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [pageSize, setPageSize] = useState(20)
+  const [page, setPage] = useState(1)
+
   const { data: summary } = useQuery({ queryKey: ['billingSummary'], queryFn: getBillingSummary, refetchInterval: 60_000 })
   const { data: plans = [] } = useQuery({ queryKey: ['plans'], queryFn: getPlans })
-  const { data: signupsData } = useQuery({ queryKey: ['emailSignups'], queryFn: () => getEmailSignups(1) })
+  const { data: signupsData } = useQuery({
+    queryKey: ['emailSignups', { page, pageSize, dateFrom, dateTo }],
+    queryFn: () => getEmailSignups(page, pageSize, dateFrom || undefined, dateTo || undefined),
+  })
+
+  const totalPages = signupsData ? Math.max(1, Math.ceil(signupsData.total / pageSize)) : 1
 
   const signupCols: Column<any>[] = [
     { key: 'email',  label: 'Email' },
@@ -87,17 +99,25 @@ export default function Billing() {
       </div>
 
       {/* Email signups */}
-      <div>
-        <h2 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold text-white flex items-center gap-2">
           <Mail size={16} className="text-accent" />
-          Email Signups ({signupsData?.total ?? 0})
+          Email Signups
         </h2>
+        <TableToolbar
+          dateFrom={dateFrom} dateTo={dateTo}
+          onDateFromChange={v => { setDateFrom(v); setPage(1) }}
+          onDateToChange={v => { setDateTo(v); setPage(1) }}
+          pageSize={pageSize}
+          onPageSizeChange={n => { setPageSize(n); setPage(1) }}
+          total={signupsData?.total}
+        />
         <DataTable
           columns={signupCols}
           data={signupsData?.signups || []}
-          emptyText="No email signups yet"
-          dateField="signed_up_at"
+          emptyText="No email signups in this range"
         />
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
       </div>
     </div>
   )

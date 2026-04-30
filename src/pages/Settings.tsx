@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getAdminUsers, createAdminUser, updateAdminUser,
   getAuditLog, getEnvStatus
 } from '../api/endpoints'
 import DataTable, { Column } from '../components/ui/DataTable'
 import Modal from '../components/ui/Modal'
+import { TableToolbar, Pagination } from '../components/ui/TableToolbar'
 import { UserPlus, Check, X, ShieldCheck } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import clsx from 'clsx'
@@ -19,9 +20,23 @@ export default function Settings() {
   const [saving, setSaving] = useState(false)
   const qc = useQueryClient()
 
+  // Audit-tab toolbar state
+  const [auditDateFrom, setAuditDateFrom] = useState('')
+  const [auditDateTo, setAuditDateTo] = useState('')
+  const [auditPageSize, setAuditPageSize] = useState(20)
+  const [auditPage, setAuditPage] = useState(1)
+
   const { data: users = [] } = useQuery({ queryKey: ['adminUsers'], queryFn: getAdminUsers })
-  const { data: audit }      = useQuery({ queryKey: ['auditLog'],  queryFn: () => getAuditLog(1), enabled: tab === 'audit' })
-  const { data: envStatus }  = useQuery({ queryKey: ['envStatus'], queryFn: getEnvStatus,      enabled: tab === 'environment' })
+  const { data: audit } = useQuery({
+    queryKey: ['auditLog', { auditPage, auditPageSize, auditDateFrom, auditDateTo }],
+    queryFn: () => getAuditLog(auditPage, auditPageSize, auditDateFrom || undefined, auditDateTo || undefined),
+    enabled: tab === 'audit',
+  })
+  const { data: envStatus } = useQuery({
+    queryKey: ['envStatus'], queryFn: getEnvStatus, enabled: tab === 'environment',
+  })
+
+  const auditTotalPages = audit ? Math.max(1, Math.ceil(audit.total / auditPageSize)) : 1
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -114,13 +129,21 @@ export default function Settings() {
 
       {/* Audit */}
       {tab === 'audit' && (
-        <div>
-          <div className="text-xs text-g-muted mb-3">{audit?.total ?? 0} audit entries</div>
+        <div className="space-y-4">
+          <TableToolbar
+            dateFrom={auditDateFrom} dateTo={auditDateTo}
+            onDateFromChange={v => { setAuditDateFrom(v); setAuditPage(1) }}
+            onDateToChange={v => { setAuditDateTo(v); setAuditPage(1) }}
+            pageSize={auditPageSize}
+            onPageSizeChange={n => { setAuditPageSize(n); setAuditPage(1) }}
+            total={audit?.total}
+          />
           <DataTable
             columns={auditCols}
             data={audit?.entries || []}
             emptyText="No audit entries"
           />
+          <Pagination page={auditPage} totalPages={auditTotalPages} onPageChange={setAuditPage} />
         </div>
       )}
 
