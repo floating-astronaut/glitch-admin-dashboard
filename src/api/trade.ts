@@ -204,3 +204,15 @@ export interface TradeSeries {
 }
 export const tradeSeries = (metric: TradeMetric, days: number = 7) =>
   api.get<TradeSeries>('/api/trade/series', { params: { metric, days } }).then(r => r.data)
+
+export interface LiveAccountSnapshot {
+  available: boolean
+  fetched_at: string | null
+  total_balance: number | null
+  total_equity: number | null
+  currency: string | null
+  accounts: Record<string, { balance?: number; equity?: number; currency?: string; error?: string }>
+  stale_seconds: number | null
+}
+export const tradeLiveAccount = () =>
+  api.get<LiveAccountSnapshot>('/api/trade/account/live').then(r => r.data)

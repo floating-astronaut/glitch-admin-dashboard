@@ -4,7 +4,7 @@ import {
   Activity, TrendingUp, TrendingDown, Wallet, Bot as BotIcon,
   Zap, BarChart3, Target,
 } from 'lucide-react'
-import { tradeStats, tradeBots, tradeSymbols, tradeSeries } from '../../api/trade'
+import { tradeStats, tradeBots, tradeSymbols, tradeSeries, tradeLiveAccount } from '../../api/trade'
 import KpiCard from '../../components/ui/KpiCard'
 import StatusBadge from '../../components/ui/StatusBadge'
 import Section from '../../components/ui/Section'
@@ -55,6 +55,11 @@ export default function TradeOverview() {
     queryFn: () => tradeSeries('signals', days),
     refetchInterval: 60_000,
   })
+  const { data: liveAcct } = useQuery({
+    queryKey: ['trade:account:live'],
+    queryFn: tradeLiveAccount,
+    refetchInterval: 15_000,
+  })
 
   const equitySpark = equitySeries?.points.map(p => p.v) ?? []
   const pnlSpark = pnlSeries?.points.map(p => p.v) ?? []
@@ -87,10 +92,20 @@ export default function TradeOverview() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
           label="Account Equity"
-          value={stats ? fmtMoney(stats.account_equity) : '…'}
+          value={
+            liveAcct?.available && liveAcct.total_equity != null
+              ? fmtMoney(liveAcct.total_equity)
+              : stats ? fmtMoney(stats.account_equity) : '…'
+          }
           icon={Wallet}
           accent
-          sub={stats ? `Balance ${fmtMoney(stats.account_balance)}` : ''}
+          sub={
+            liveAcct?.available && liveAcct.total_balance != null
+              ? `Balance ${fmtMoney(liveAcct.total_balance)} · live ${
+                  liveAcct.stale_seconds != null ? `${Math.round(liveAcct.stale_seconds)}s ago` : ''
+                }`
+              : stats ? `Balance ${fmtMoney(stats.account_balance)} · snapshot` : ''
+          }
           spark={equitySpark}
         />
         <KpiCard
