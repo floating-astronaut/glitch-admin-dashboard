@@ -26,6 +26,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/grow/voice':                    'Grow · Voice / COD Agent',
   '/edge':            'Edge · Betting',
   '/clients':         'Customers',
+  '/admin/customers':       'Admin · Customers',
+  '/admin/customers/leads': 'Admin · Customers · Leads',
   '/billing':         'Billing',
   '/infrastructure':  'Infrastructure',
   '/settings':        'Settings',

@@ -3,14 +3,16 @@ import { useAuthStore } from './stores/auth'
 import Layout from './components/layout/Layout'
 import Login from './pages/Login'
 import DashboardHome from './pages/DashboardHome'
-import Clients from './pages/Clients'
-import ClientDetail from './pages/ClientDetail'
 import Billing from './pages/Billing'
 import Infrastructure from './pages/Infrastructure'
 import Settings from './pages/Settings'
 import ControlCentre  from './pages/admin/ControlCentre'
 import UserManagement from './pages/admin/UserManagement'
 import AuditLogs      from './pages/admin/AuditLogs'
+import CustomersLayout from './pages/admin/customers/Layout'
+import CustomersBuyers from './pages/admin/customers/Buyers'
+import CustomersLeads  from './pages/admin/customers/Leads'
+import BuyerDetail     from './pages/admin/customers/BuyerDetail'
 
 // Trade vertical
 import TradeOverview from './pages/trade/Overview'
@@ -92,8 +94,14 @@ export default function App() {
           <Route path="edge/betting"      element={<EdgeOverview />} />
 
           {/* Admin (cross-cutting) */}
-          <Route path="clients"        element={<Clients />} />
-          <Route path="clients/:id"    element={<ClientDetail />} />
+          <Route path="admin/customers" element={<CustomersLayout />}>
+            <Route index                          element={<CustomersBuyers />} />
+            <Route path="leads"                   element={<CustomersLeads />} />
+            <Route path="buyers/:paymentId"       element={<BuyerDetail />} />
+          </Route>
+          {/* Legacy /clients routes redirect to the new unified customers surface */}
+          <Route path="clients"        element={<Navigate to="/admin/customers" replace />} />
+          <Route path="clients/:id"    element={<Navigate to="/admin/customers" replace />} />
           <Route path="billing"        element={<Billing />} />
           <Route path="infrastructure" element={<Infrastructure />} />
           <Route path="settings"       element={<Settings />} />

@@ -17,13 +17,14 @@ interface Props<T> {
   className?: string
   dateField?: string
   defaultPageSize?: number
+  onRowClick?: (row: T) => void
 }
 
 const PAGE_SIZE_OPTIONS = [20, 50, 100]
 
 export default function DataTable<T extends Record<string, any>>({
   columns, data, keyField = 'id', loading, emptyText = 'No data', className,
-  dateField, defaultPageSize = 20,
+  dateField, defaultPageSize = 20, onRowClick,
 }: Props<T>) {
   const [pageSize, setPageSize] = useState(defaultPageSize)
   const [currentPage, setCurrentPage] = useState(1)
@@ -173,7 +174,11 @@ export default function DataTable<T extends Record<string, any>>({
               paginated.map((row, i) => (
                 <tr
                   key={row[keyField] ?? i}
-                  className="border-b border-g-border/50 hover:bg-white/2 transition-colors"
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  className={clsx(
+                    'border-b border-g-border/50 hover:bg-white/2 transition-colors',
+                    onRowClick && 'cursor-pointer hover:bg-accent/5',
+                  )}
                 >
                   {columns.map(col => (
                     <td key={col.key} className={clsx('px-4 py-3 text-g-text', col.className)}>

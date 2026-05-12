@@ -52,7 +52,7 @@ const NAV: NavGroup[] = [
     defaultOpen: true,
     items: [
       { label: 'Home',            icon: LayoutDashboard, to: '/', end: true },
-      { label: 'Customers',       icon: Users,           to: '/clients' },
+      { label: 'Customers',       icon: Users,           to: '/admin/customers' },
       { label: 'Billing',         icon: CreditCard,      to: '/billing' },
       { label: 'Infrastructure',  icon: Server,          to: '/infrastructure' },
       { label: 'Control Centre',  icon: LayoutGrid,      to: '/admin/control-centre' },
