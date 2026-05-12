@@ -102,3 +102,16 @@ export const budzSends = (params: {
 
 export const budzFunnel = () =>
   api.get<FunnelRow[]>('/api/grow/budz/funnel').then(r => r.data)
+
+export type GrowAgentId = 'sales' | 'ads' | 'social' | 'ugc' | 'seo' | 'voice'
+export type GrowAgentStatus = 'healthy' | 'degraded' | 'stale' | 'offline' | 'coming_soon'
+export interface GrowAgentSummary {
+  id: GrowAgentId
+  name: string
+  status: GrowAgentStatus
+  deployments: number
+  pending_approvals: number
+  outputs_7d: number
+}
+export const growAgentsSummary = () =>
+  api.get<{ agents: GrowAgentSummary[] }>('/api/grow/agents/summary').then(r => r.data)
