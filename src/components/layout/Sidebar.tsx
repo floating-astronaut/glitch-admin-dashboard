@@ -5,11 +5,13 @@ import {
   Server, Settings, Zap, X, Sprout,
   Shield, BarChart3, Newspaper,
   ChevronDown, ShieldCheck, LayoutGrid,
+  MessageSquare, Megaphone, Share2, Film, Search, PhoneCall,
+  Target, FileClock,
 } from 'lucide-react'
 import { useUIStore } from '../../stores/ui'
 import clsx from 'clsx'
 
-interface NavItem { label: string; icon: any; to: string }
+interface NavItem { label: string; icon: any; to: string; end?: boolean }
 interface NavGroup { section: string; defaultOpen?: boolean; items: NavItem[] }
 
 const NAV: NavGroup[] = [
@@ -17,7 +19,7 @@ const NAV: NavGroup[] = [
     section: 'TRADE',
     defaultOpen: true,
     items: [
-      { label: 'Overview',  icon: LayoutDashboard, to: '/trade' },
+      { label: 'Overview',  icon: LayoutDashboard, to: '/trade', end: true },
       { label: 'Bots',      icon: Bot,             to: '/trade/bots' },
       { label: 'Signals',   icon: Zap,             to: '/trade/signals' },
       { label: 'Trades',    icon: BarChart3,       to: '/trade/trades' },
@@ -29,23 +31,33 @@ const NAV: NavGroup[] = [
     section: 'GROW',
     defaultOpen: true,
     items: [
-      { label: 'Overview',         icon: Sprout,    to: '/grow' },
-      { label: 'Budz · Overview',  icon: LayoutDashboard, to: '/grow/budz' },
-      { label: 'Budz · Leads',     icon: Users,     to: '/grow/budz/leads' },
-      { label: 'Budz · Drafts',    icon: BarChart3, to: '/grow/budz/drafts' },
-      { label: 'Budz · Sends',     icon: Zap,       to: '/grow/budz/sends' },
+      { label: 'Overview',     icon: Sprout,        to: '/grow', end: true },
+      { label: 'Sales Agent',  icon: MessageSquare, to: '/grow/sales' },
+      { label: 'Ads Agent',    icon: Megaphone,     to: '/grow/ads' },
+      { label: 'Social Agent', icon: Share2,        to: '/grow/social' },
+      { label: 'UGC Agent',    icon: Film,          to: '/grow/ugc' },
+      { label: 'SEO Agent',    icon: Search,        to: '/grow/seo' },
+      { label: 'Voice Agent',  icon: PhoneCall,     to: '/grow/voice' },
+    ],
+  },
+  {
+    section: 'EDGE',
+    defaultOpen: true,
+    items: [
+      { label: 'Betting',      icon: Target,          to: '/edge' },
     ],
   },
   {
     section: 'ADMIN',
     defaultOpen: true,
     items: [
-      { label: 'Home',            icon: LayoutDashboard, to: '/' },
+      { label: 'Home',            icon: LayoutDashboard, to: '/', end: true },
       { label: 'Customers',       icon: Users,           to: '/clients' },
       { label: 'Billing',         icon: CreditCard,      to: '/billing' },
       { label: 'Infrastructure',  icon: Server,          to: '/infrastructure' },
       { label: 'Control Centre',  icon: LayoutGrid,      to: '/admin/control-centre' },
       { label: 'User Management', icon: ShieldCheck,     to: '/admin/users' },
+      { label: 'Audit Logs',      icon: FileClock,       to: '/admin/audit-logs' },
       { label: 'Settings',        icon: Settings,        to: '/settings' },
     ],
   },
@@ -74,7 +86,7 @@ function Group({ group }: { group: NavGroup }) {
         <NavLink
           key={item.to}
           to={item.to}
-          end={item.to === '/' || item.to === '/trade' || item.to === '/grow'}
+          end={item.end}
           className={({ isActive }) => clsx(
             'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
             isActive
@@ -125,7 +137,7 @@ export default function Sidebar() {
         </nav>
 
         <div className="px-4 py-3 border-t border-g-border text-[10px] text-g-dim font-mono">
-          v2.0.0
+          v2.1.0
         </div>
       </aside>
     </>

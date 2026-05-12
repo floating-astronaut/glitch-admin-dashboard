@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Send, Eye, MessageSquare, AlertTriangle, Ban } from 'lucide-react'
-import { budzSends } from '../../../api/grow'
-import { TableToolbar, Pagination } from '../../../components/ui/TableToolbar'
+import { budzSends } from '../../../../api/grow'
+import { TableToolbar, Pagination } from '../../../../components/ui/TableToolbar'
 import { format, formatDistanceToNow } from 'date-fns'
 
 export default function BudzSends() {

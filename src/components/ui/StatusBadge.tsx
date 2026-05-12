@@ -15,6 +15,10 @@ const COLORS: Record<string, string> = {
   live:     'bg-green-500/20 text-green-300 border-green-500/30',
   stale:    'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
   unknown:  'bg-gray-500/20 text-gray-300 border-gray-500/30',
+  // Agent statuses (healthy/unhealthy already defined below)
+  degraded: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+  offline:  'bg-red-500/20 text-red-300 border-red-500/30',
+  coming_soon: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
   // Service statuses
   running:  'bg-green-500/20 text-green-300 border-green-500/30',
   stopped:  'bg-red-500/20 text-red-300 border-red-500/30',

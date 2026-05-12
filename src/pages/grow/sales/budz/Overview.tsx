@@ -4,8 +4,8 @@ import {
   Cannabis, Mail, Inbox, Send, Eye, MessageSquare,
   ArrowRight, Users, Pause,
 } from 'lucide-react'
-import { budzStats, budzFunnel } from '../../../api/grow'
-import KpiCard from '../../../components/ui/KpiCard'
+import { budzStats, budzFunnel } from '../../../../api/grow'
+import KpiCard from '../../../../components/ui/KpiCard'
 
 export default function BudzOverview() {
   const navigate = useNavigate()

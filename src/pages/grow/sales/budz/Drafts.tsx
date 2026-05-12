@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Inbox, ChevronDown, ChevronRight } from 'lucide-react'
-import { budzDrafts, type EmailDraft } from '../../../api/grow'
-import { TableToolbar, Pagination } from '../../../components/ui/TableToolbar'
+import { budzDrafts, type EmailDraft } from '../../../../api/grow'
+import { TableToolbar, Pagination } from '../../../../components/ui/TableToolbar'
 import { format, formatDistanceToNow } from 'date-fns'
 import clsx from 'clsx'
 

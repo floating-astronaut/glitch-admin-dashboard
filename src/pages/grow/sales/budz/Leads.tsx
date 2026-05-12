@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Users, Search, ExternalLink } from 'lucide-react'
-import { budzLeads } from '../../../api/grow'
-import { TableToolbar, Pagination } from '../../../components/ui/TableToolbar'
+import { budzLeads } from '../../../../api/grow'
+import { TableToolbar, Pagination } from '../../../../components/ui/TableToolbar'
 import { formatDistanceToNow } from 'date-fns'
 import clsx from 'clsx'
 

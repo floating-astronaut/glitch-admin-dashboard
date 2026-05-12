@@ -10,6 +10,7 @@ import Infrastructure from './pages/Infrastructure'
 import Settings from './pages/Settings'
 import ControlCentre  from './pages/admin/ControlCentre'
 import UserManagement from './pages/admin/UserManagement'
+import AuditLogs      from './pages/admin/AuditLogs'
 
 // Trade vertical
 import TradeOverview from './pages/trade/Overview'
@@ -21,10 +22,19 @@ import TradeNews from './pages/trade/News'
 
 // Grow vertical
 import GrowOverview from './pages/grow/Overview'
-import BudzOverview from './pages/grow/budz/Overview'
-import BudzLeads    from './pages/grow/budz/Leads'
-import BudzDrafts   from './pages/grow/budz/Drafts'
-import BudzSends    from './pages/grow/budz/Sends'
+import SalesAgentOverview from './pages/grow/sales/Overview'
+import AdsAgentOverview from './pages/grow/ads/Overview'
+import SocialAgentOverview from './pages/grow/social/Overview'
+import UgcAgentOverview from './pages/grow/ugc/Overview'
+import SeoAgentOverview from './pages/grow/seo/Overview'
+import VoiceAgentOverview from './pages/grow/voice/Overview'
+import BudzOverview from './pages/grow/sales/budz/Overview'
+import BudzLeads    from './pages/grow/sales/budz/Leads'
+import BudzDrafts   from './pages/grow/sales/budz/Drafts'
+import BudzSends    from './pages/grow/sales/budz/Sends'
+
+// Edge vertical
+import EdgeOverview from './pages/edge/Overview'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -56,11 +66,27 @@ export default function App() {
           <Route path="trade/news"     element={<TradeNews />} />
 
           {/* Grow vertical */}
-          <Route path="grow"              element={<GrowOverview />} />
-          <Route path="grow/budz"         element={<BudzOverview />} />
-          <Route path="grow/budz/leads"   element={<BudzLeads />} />
-          <Route path="grow/budz/drafts"  element={<BudzDrafts />} />
-          <Route path="grow/budz/sends"   element={<BudzSends />} />
+          <Route path="grow"               element={<GrowOverview />} />
+          <Route path="grow/sales"         element={<SalesAgentOverview />} />
+          <Route path="grow/sales/budz"        element={<BudzOverview />} />
+          <Route path="grow/sales/budz/leads"  element={<BudzLeads />} />
+          <Route path="grow/sales/budz/drafts" element={<BudzDrafts />} />
+          <Route path="grow/sales/budz/sends"  element={<BudzSends />} />
+          <Route path="grow/ads"           element={<AdsAgentOverview />} />
+          <Route path="grow/social"        element={<SocialAgentOverview />} />
+          <Route path="grow/ugc"           element={<UgcAgentOverview />} />
+          <Route path="grow/seo"           element={<SeoAgentOverview />} />
+          <Route path="grow/voice"         element={<VoiceAgentOverview />} />
+
+          {/* Legacy /grow/budz/* → /grow/sales/budz/* */}
+          <Route path="grow/budz"         element={<Navigate to="/grow/sales/budz" replace />} />
+          <Route path="grow/budz/leads"   element={<Navigate to="/grow/sales/budz/leads" replace />} />
+          <Route path="grow/budz/drafts"  element={<Navigate to="/grow/sales/budz/drafts" replace />} />
+          <Route path="grow/budz/sends"   element={<Navigate to="/grow/sales/budz/sends" replace />} />
+
+          {/* Edge vertical */}
+          <Route path="edge"              element={<EdgeOverview />} />
+          <Route path="edge/betting"      element={<EdgeOverview />} />
 
           {/* Admin (cross-cutting) */}
           <Route path="clients"        element={<Clients />} />
@@ -70,6 +96,7 @@ export default function App() {
           <Route path="settings"       element={<Settings />} />
           <Route path="admin/control-centre" element={<ControlCentre />} />
           <Route path="admin/users"          element={<UserManagement />} />
+          <Route path="admin/audit-logs"     element={<AuditLogs />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
