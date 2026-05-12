@@ -210,8 +210,15 @@ export interface LiveAccountSnapshot {
   fetched_at: string | null
   total_balance: number | null
   total_equity: number | null
+  total_floating_pnl: number | null
+  total_open_positions: number | null
+  total_open_lots: number | null
   currency: string | null
-  accounts: Record<string, { balance?: number; equity?: number; currency?: string; error?: string }>
+  accounts: Record<string, {
+    balance?: number; equity?: number; floating_pnl?: number;
+    open_positions?: number; open_lots?: number;
+    currency?: string; error?: string
+  }>
   stale_seconds: number | null
 }
 export const tradeLiveAccount = () =>

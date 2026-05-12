@@ -112,15 +112,27 @@ export default function TradeOverview() {
           label={`PnL (${days}d)`}
           value={stats ? fmtMoney(pnl) : '…'}
           icon={pnlPositive ? TrendingUp : TrendingDown}
-          sub={stats ? `${stats.wins}W / ${stats.losses}L · ${stats.win_rate_pct ?? '—'}%` : ''}
+          sub={
+            liveAcct?.available && liveAcct.total_floating_pnl != null
+              ? `${stats?.wins ?? 0}W / ${stats?.losses ?? 0}L · floating ${liveAcct.total_floating_pnl >= 0 ? '+' : ''}${fmtMoney(liveAcct.total_floating_pnl)}`
+              : stats ? `${stats.wins}W / ${stats.losses}L · ${stats.win_rate_pct ?? '—'}%` : ''
+          }
           trend={pnlPositive ? 'up' : 'down'}
           spark={pnlSpark}
         />
         <KpiCard
           label="Open Positions"
-          value={stats?.trades_open ?? '…'}
+          value={
+            liveAcct?.available && liveAcct.total_open_positions != null
+              ? liveAcct.total_open_positions
+              : stats?.trades_open ?? '…'
+          }
           icon={Activity}
-          sub={stats ? `${stats.trades_closed} closed in ${days}d` : ''}
+          sub={
+            liveAcct?.available && liveAcct.total_open_positions != null
+              ? `live · ${stats?.trades_closed ?? 0} closed in ${days}d`
+              : stats ? `${stats.trades_closed} closed in ${days}d` : ''
+          }
         />
         <KpiCard
           label="Avg Confidence"
