@@ -1,15 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
 import {
-  Cannabis, Mail, Inbox, Send, Eye, MessageSquare,
-  ArrowRight, Users, Pause,
+  Mail, Inbox, Send, Eye, MessageSquare, Users, Pause,
 } from 'lucide-react'
 import { budzStats, budzFunnel } from '../../../../api/grow'
 import KpiCard from '../../../../components/ui/KpiCard'
+import Section from '../../../../components/ui/Section'
 
 export default function BudzOverview() {
-  const navigate = useNavigate()
-
   const { data: stats, isLoading } = useQuery({
     queryKey: ['grow:budz:stats'],
     queryFn: budzStats,
@@ -25,10 +22,6 @@ export default function BudzOverview() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-        <Cannabis size={14} className="text-accent" /> Glitch Budz
-      </h2>
-
       {/* Top KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
@@ -61,15 +54,14 @@ export default function BudzOverview() {
 
       {/* Email pipeline */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard label="Approved drafts"  value={dim(stats?.drafts_by_state?.approved)}  icon={Mail} />
-        <KpiCard label="Superseded"        value={dim(stats?.drafts_by_state?.superseded)} icon={Pause} />
-        <KpiCard label="Bounced"           value={dim(stats?.bounces)} icon={MessageSquare} />
-        <KpiCard label="Unsubscribed"      value={dim(stats?.unsubs)}  icon={MessageSquare} />
+        <KpiCard label="Approved drafts" value={dim(stats?.drafts_by_state?.approved)}  icon={Mail} />
+        <KpiCard label="Superseded"      value={dim(stats?.drafts_by_state?.superseded)} icon={Pause} />
+        <KpiCard label="Bounced"         value={dim(stats?.bounces)} icon={MessageSquare} />
+        <KpiCard label="Unsubscribed"    value={dim(stats?.unsubs)}  icon={MessageSquare} />
       </div>
 
       {/* Funnel snapshot */}
-      <div>
-        <h3 className="text-sm font-semibold text-white mb-3">Funnel</h3>
+      <Section title="Funnel">
         <div className="overflow-x-auto rounded-xl border border-g-border">
           <table className="w-full text-sm">
             <thead>
@@ -94,34 +86,7 @@ export default function BudzOverview() {
             </tbody>
           </table>
         </div>
-      </div>
-
-      {/* Quick links */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          { label: 'Leads',  to: '/grow/budz/leads',  icon: Users,
-            sub: `${stats?.leads_total ?? 0} total` },
-          { label: 'Drafts (HITL)', to: '/grow/budz/drafts', icon: Inbox,
-            sub: `${stats?.drafts_pending ?? 0} pending approval` },
-          { label: 'Sends', to: '/grow/budz/sends', icon: Send,
-            sub: `${stats?.sends_total ?? 0} total` },
-        ].map(({ label, to, icon: Icon, sub }) => (
-          <button
-            key={to}
-            onClick={() => navigate(to)}
-            className="flex items-center justify-between px-4 py-3 bg-g-card border border-g-border rounded-xl hover:border-accent/30 hover:bg-accent/5 transition-all group"
-          >
-            <div className="flex items-center gap-3 text-sm text-g-text">
-              <Icon size={16} className="text-g-muted group-hover:text-accent" />
-              <div className="text-left">
-                <div>{label}</div>
-                <div className="text-[10px] text-g-dim">{sub}</div>
-              </div>
-            </div>
-            <ArrowRight size={14} className="text-g-dim group-hover:text-accent" />
-          </button>
-        ))}
-      </div>
+      </Section>
     </div>
   )
 }

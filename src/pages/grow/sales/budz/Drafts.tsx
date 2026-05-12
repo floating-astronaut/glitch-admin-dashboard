@@ -95,9 +95,6 @@ export default function BudzDrafts() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-        <Inbox size={14} className="text-accent" /> Glitch Budz · Drafts (HITL queue)
-      </h2>
 
       <TableToolbar
         dateFrom={dateFrom} dateTo={dateTo}

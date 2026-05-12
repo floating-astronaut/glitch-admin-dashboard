@@ -43,9 +43,6 @@ export default function BudzLeads() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-        <Users size={14} className="text-accent" /> Glitch Budz · Leads
-      </h2>
 
       <TableToolbar
         dateFrom={dateFrom} dateTo={dateTo}

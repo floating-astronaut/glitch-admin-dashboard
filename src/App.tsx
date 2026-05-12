@@ -28,6 +28,7 @@ import SocialAgentOverview from './pages/grow/social/Overview'
 import UgcAgentOverview from './pages/grow/ugc/Overview'
 import SeoAgentOverview from './pages/grow/seo/Overview'
 import VoiceAgentOverview from './pages/grow/voice/Overview'
+import BudzLayout   from './pages/grow/sales/budz/Layout'
 import BudzOverview from './pages/grow/sales/budz/Overview'
 import BudzLeads    from './pages/grow/sales/budz/Leads'
 import BudzDrafts   from './pages/grow/sales/budz/Drafts'
@@ -68,10 +69,12 @@ export default function App() {
           {/* Grow vertical */}
           <Route path="grow"               element={<GrowOverview />} />
           <Route path="grow/sales"         element={<SalesAgentOverview />} />
-          <Route path="grow/sales/budz"        element={<BudzOverview />} />
-          <Route path="grow/sales/budz/leads"  element={<BudzLeads />} />
-          <Route path="grow/sales/budz/drafts" element={<BudzDrafts />} />
-          <Route path="grow/sales/budz/sends"  element={<BudzSends />} />
+          <Route path="grow/sales/budz" element={<BudzLayout />}>
+            <Route index           element={<BudzOverview />} />
+            <Route path="leads"    element={<BudzLeads />} />
+            <Route path="drafts"   element={<BudzDrafts />} />
+            <Route path="sends"    element={<BudzSends />} />
+          </Route>
           <Route path="grow/ads"           element={<AdsAgentOverview />} />
           <Route path="grow/social"        element={<SocialAgentOverview />} />
           <Route path="grow/ugc"           element={<UgcAgentOverview />} />
