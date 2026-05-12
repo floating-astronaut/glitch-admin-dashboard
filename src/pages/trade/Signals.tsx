@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { tradeSignals, tradeBots } from '../../api/trade'
 import { format, formatDistanceToNow } from 'date-fns'
@@ -22,7 +23,14 @@ function VotePill({ vote }: { vote: string }) {
 }
 
 export default function TradeSignals() {
-  const [bot, setBot] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [bot, setBotState] = useState(searchParams.get('bot') ?? '')
+  const setBot = (v: string) => {
+    setBotState(v)
+    const next = new URLSearchParams(searchParams)
+    if (v) next.set('bot', v); else next.delete('bot')
+    setSearchParams(next, { replace: true })
+  }
   const [vote, setVote] = useState('')
   const [executed, setExecuted] = useState<'all' | 'true' | 'false'>('all')
   const [dateFrom, setDateFrom] = useState('')

@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import clsx from 'clsx'
 import {
   Activity, TrendingUp, TrendingDown, Wallet, Bot as BotIcon,
   Zap, BarChart3, Target,
@@ -23,7 +25,9 @@ function fmtMoney(n: number, dp = 2) {
 }
 
 export default function TradeOverview() {
+  const navigate = useNavigate()
   const [days, setDays] = useState(7)
+  const [hoveredBot, setHoveredBot] = useState<string | null>(null)
 
   const { data: stats } = useQuery({
     queryKey: ['trade:stats', days],
@@ -149,24 +153,55 @@ export default function TradeOverview() {
           <Card><EmptyState icon={BotIcon} title="No bots reporting" description="Bots will appear once the trade engine emits signals." /></Card>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {bots.map(b => (
-              <Card key={b.bot} padded={false} className="p-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-white capitalize">{b.bot}</span>
-                  <StatusBadge value={b.status} dot />
-                </div>
-                <div className="text-xs text-g-muted">
-                  <div>{b.signal_count_7d.toLocaleString()} signals/7d</div>
-                  <div>{b.executed_count_7d} executed</div>
-                  <div>{b.symbols} symbols</div>
-                </div>
-                <div className="text-[10px] text-g-dim">
-                  {b.last_signal_at
-                    ? formatDistanceToNow(new Date(b.last_signal_at), { addSuffix: true })
-                    : 'never'}
-                </div>
-              </Card>
-            ))}
+            {bots.map(b => {
+              const execRate = b.signal_count_7d > 0
+                ? Math.round((b.executed_count_7d / b.signal_count_7d) * 100)
+                : 0
+              return (
+                <button
+                  key={b.bot}
+                  type="button"
+                  onClick={() => navigate(`/trade/signals?bot=${encodeURIComponent(b.bot)}`)}
+                  onMouseEnter={() => setHoveredBot(b.bot)}
+                  onMouseLeave={() => setHoveredBot(prev => prev === b.bot ? null : prev)}
+                  className="text-left rounded-xl border bg-g-card p-3 space-y-2 transition-all border-g-border hover:border-accent/40 hover:bg-accent/5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent/5 focus:outline-none focus:ring-2 focus:ring-accent/40"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-white capitalize">{b.bot}</span>
+                    <StatusBadge value={b.status} dot />
+                  </div>
+                  <div className="text-xs text-g-muted">
+                    <div>{b.signal_count_7d.toLocaleString()} signals/7d</div>
+                    <div className="flex items-center gap-2">
+                      <span>{b.executed_count_7d} executed</span>
+                      <span className="text-g-dim">·</span>
+                      <span className={execRate >= 5 ? 'text-accent' : 'text-g-dim'}>{execRate}%</span>
+                    </div>
+                    <div>{b.symbols} symbols</div>
+                  </div>
+                  {/* Execution rate bar */}
+                  <div className="h-1 w-full bg-white/5 rounded overflow-hidden">
+                    <div
+                      className="h-full bg-accent/60 transition-all"
+                      style={{ width: `${Math.min(100, execRate * 4)}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-g-dim">
+                      {b.last_signal_at
+                        ? formatDistanceToNow(new Date(b.last_signal_at), { addSuffix: true })
+                        : 'never'}
+                    </span>
+                    <span className={clsx(
+                      'text-accent opacity-0 transition-opacity',
+                      hoveredBot === b.bot && 'opacity-100',
+                    )}>
+                      view signals →
+                    </span>
+                  </div>
+                </button>
+              )
+            })}
           </div>
         )}
       </Section>
