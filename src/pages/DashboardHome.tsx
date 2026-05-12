@@ -4,6 +4,8 @@ import { getKpis, getAlerts, getActivity } from '../api/endpoints'
 import KpiCard from '../components/ui/KpiCard'
 import DataTable, { Column } from '../components/ui/DataTable'
 import StatusBadge from '../components/ui/StatusBadge'
+import Card from '../components/ui/Card'
+import Section from '../components/ui/Section'
 import {
   Users, DollarSign, Bot, Activity, Mail,
   AlertCircle, ArrowRight, BarChart3, Wallet, Zap,
@@ -142,7 +144,7 @@ export default function DashboardHome() {
       </div>
 
       {kpis?.by_tier && Object.keys(kpis.by_tier).length > 0 && (
-        <div className="bg-g-card border border-g-border rounded-xl p-4">
+        <Card>
           <h2 className="text-sm font-semibold text-white mb-3">Customers by Tier</h2>
           <div className="flex gap-4 flex-wrap">
             {Object.entries(kpis.by_tier).map(([tier, count]) => (
@@ -152,7 +154,7 @@ export default function DashboardHome() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -175,8 +177,7 @@ export default function DashboardHome() {
         ))}
       </div>
 
-      <div>
-        <h2 className="text-sm font-semibold text-white mb-3">Recent Activity</h2>
+      <Section title="Recent Activity">
         <DataTable
           columns={activityCols}
           data={activity}
@@ -184,7 +185,7 @@ export default function DashboardHome() {
           emptyText="No recent activity"
           dateField="created_at"
         />
-      </div>
+      </Section>
     </div>
   )
 }

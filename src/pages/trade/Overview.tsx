@@ -4,9 +4,12 @@ import {
   Activity, TrendingUp, TrendingDown, Wallet, Bot as BotIcon,
   Zap, BarChart3, Target,
 } from 'lucide-react'
-import { tradeStats, tradeBots, tradeSymbols } from '../../api/trade'
+import { tradeStats, tradeBots, tradeSymbols, tradeSeries } from '../../api/trade'
 import KpiCard from '../../components/ui/KpiCard'
 import StatusBadge from '../../components/ui/StatusBadge'
+import Section from '../../components/ui/Section'
+import Card from '../../components/ui/Card'
+import EmptyState from '../../components/ui/EmptyState'
 import { formatDistanceToNow } from 'date-fns'
 
 const RANGE = [
@@ -37,6 +40,25 @@ export default function TradeOverview() {
     queryFn: tradeSymbols,
     refetchInterval: 30_000,
   })
+  const { data: equitySeries } = useQuery({
+    queryKey: ['trade:series', 'equity', days],
+    queryFn: () => tradeSeries('equity', days),
+    refetchInterval: 60_000,
+  })
+  const { data: pnlSeries } = useQuery({
+    queryKey: ['trade:series', 'pnl', days],
+    queryFn: () => tradeSeries('pnl', days),
+    refetchInterval: 60_000,
+  })
+  const { data: signalsSeries } = useQuery({
+    queryKey: ['trade:series', 'signals', days],
+    queryFn: () => tradeSeries('signals', days),
+    refetchInterval: 60_000,
+  })
+
+  const equitySpark = equitySeries?.points.map(p => p.v) ?? []
+  const pnlSpark = pnlSeries?.points.map(p => p.v) ?? []
+  const signalsSpark = signalsSeries?.points.map(p => p.v) ?? []
 
   const pnl = stats?.total_pnl ?? 0
   const pnlPositive = pnl >= 0
@@ -69,6 +91,7 @@ export default function TradeOverview() {
           icon={Wallet}
           accent
           sub={stats ? `Balance ${fmtMoney(stats.account_balance)}` : ''}
+          spark={equitySpark}
         />
         <KpiCard
           label={`PnL (${days}d)`}
@@ -76,6 +99,7 @@ export default function TradeOverview() {
           icon={pnlPositive ? TrendingUp : TrendingDown}
           sub={stats ? `${stats.wins}W / ${stats.losses}L · ${stats.win_rate_pct ?? '—'}%` : ''}
           trend={pnlPositive ? 'up' : 'down'}
+          spark={pnlSpark}
         />
         <KpiCard
           label="Open Positions"
@@ -88,41 +112,40 @@ export default function TradeOverview() {
           value={stats ? `${(stats.avg_confidence * 100).toFixed(1)}%` : '…'}
           icon={Target}
           sub={stats ? `${stats.executed} executed of ${stats.signals.toLocaleString()}` : ''}
+          spark={signalsSpark}
         />
       </div>
 
       {/* Bots grid */}
-      <div>
-        <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-          <BotIcon size={14} className="text-accent" /> Snake Bots
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {bots.map(b => (
-            <div key={b.bot} className="rounded-xl border border-g-border bg-g-card p-3 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-white capitalize">{b.bot}</span>
-                <StatusBadge value={b.status} dot />
-              </div>
-              <div className="text-xs text-g-muted">
-                <div>{b.signal_count_7d.toLocaleString()} signals/7d</div>
-                <div>{b.executed_count_7d} executed</div>
-                <div>{b.symbols} symbols</div>
-              </div>
-              <div className="text-[10px] text-g-dim">
-                {b.last_signal_at
-                  ? formatDistanceToNow(new Date(b.last_signal_at), { addSuffix: true })
-                  : 'never'}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Section title={<span className="flex items-center gap-2"><BotIcon size={14} className="text-accent" /> Snake Bots</span>}>
+        {bots.length === 0 ? (
+          <Card><EmptyState icon={BotIcon} title="No bots reporting" description="Bots will appear once the trade engine emits signals." /></Card>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {bots.map(b => (
+              <Card key={b.bot} padded={false} className="p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-white capitalize">{b.bot}</span>
+                  <StatusBadge value={b.status} dot />
+                </div>
+                <div className="text-xs text-g-muted">
+                  <div>{b.signal_count_7d.toLocaleString()} signals/7d</div>
+                  <div>{b.executed_count_7d} executed</div>
+                  <div>{b.symbols} symbols</div>
+                </div>
+                <div className="text-[10px] text-g-dim">
+                  {b.last_signal_at
+                    ? formatDistanceToNow(new Date(b.last_signal_at), { addSuffix: true })
+                    : 'never'}
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </Section>
 
       {/* Active symbols */}
-      <div>
-        <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-          <BarChart3 size={14} className="text-accent" /> Active Symbols
-        </h3>
+      <Section title={<span className="flex items-center gap-2"><BarChart3 size={14} className="text-accent" /> Active Symbols</span>}>
         <div className="overflow-x-auto rounded-xl border border-g-border">
           <table className="w-full text-sm">
             <thead>
@@ -156,7 +179,7 @@ export default function TradeOverview() {
             </tbody>
           </table>
         </div>
-      </div>
+      </Section>
     </div>
   )
 }

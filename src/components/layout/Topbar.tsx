@@ -1,7 +1,9 @@
-import { Menu, LogOut, User } from 'lucide-react'
+import { Menu, LogOut, User, Search } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useUIStore } from '../../stores/ui'
 import { useAuthStore } from '../../stores/auth'
 import { useNavigate } from 'react-router-dom'
+import CommandPalette from '../ui/CommandPalette'
 
 interface Props {
   title: string
@@ -11,6 +13,18 @@ export default function Topbar({ title }: Props) {
   const { toggleSidebar } = useUIStore()
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
+  const [paletteOpen, setPaletteOpen] = useState(false)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen(o => !o)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const handleLogout = () => {
     logout()
@@ -28,6 +42,16 @@ export default function Topbar({ title }: Props) {
 
       <h1 className="text-sm font-semibold text-white flex-1">{title}</h1>
 
+      <button
+        onClick={() => setPaletteOpen(true)}
+        className="hidden sm:flex items-center gap-2 px-2.5 h-8 rounded-lg border border-g-border text-g-muted hover:text-g-text hover:border-accent/40 transition-colors"
+        title="Jump to… (⌘K)"
+      >
+        <Search size={14} />
+        <span className="text-xs">Jump to…</span>
+        <kbd className="text-[10px] font-mono text-g-dim border border-g-border rounded px-1 py-0.5 ml-1">⌘K</kbd>
+      </button>
+
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 text-sm text-g-muted">
           <User size={14} />
@@ -44,6 +68,8 @@ export default function Topbar({ title }: Props) {
           <LogOut size={16} />
         </button>
       </div>
+
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </header>
   )
 }

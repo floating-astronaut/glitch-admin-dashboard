@@ -194,3 +194,13 @@ export const tradeNews = (params: {
 
 export const tradeBars = (symbol: string, timeframe: string, limit = 500) =>
   api.get(`/api/trade/bars/${symbol}/${timeframe}`, { params: { limit } }).then(r => r.data)
+
+export type TradeMetric = 'pnl' | 'equity' | 'signals' | 'trades'
+export interface TradeSeriesPoint { t: string; v: number }
+export interface TradeSeries {
+  metric: TradeMetric
+  days: number
+  points: TradeSeriesPoint[]
+}
+export const tradeSeries = (metric: TradeMetric, days: number = 7) =>
+  api.get<TradeSeries>('/api/trade/series', { params: { metric, days } }).then(r => r.data)
