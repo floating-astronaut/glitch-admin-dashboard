@@ -10,7 +10,7 @@ import { tradeStats, tradeBots, tradeSymbols, tradeSeries, tradeLiveAccount } fr
 import KpiCard from '../../components/ui/KpiCard'
 import StatusBadge from '../../components/ui/StatusBadge'
 import Section from '../../components/ui/Section'
-import Card from '../../components/ui/Card'
+import Card from '../../components/ui/Surface'
 import EmptyState from '../../components/ui/EmptyState'
 import { formatDistanceToNow } from 'date-fns'
 

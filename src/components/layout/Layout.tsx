@@ -1,9 +1,14 @@
 import { Outlet, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
-import Sidebar from './Sidebar'
-import Topbar from './Topbar'
-import { useAuthStore } from '../../stores/auth'
-import { useWebSocket } from '../../hooks/useWebSocket'
+import { useEffect, useState } from 'react'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
+import { useAuthStore } from '@/stores/auth'
+import { useWebSocket } from '@/hooks/useWebSocket'
+import AppSidebar from './AppSidebar'
+import ThemeSwitch from '@/components/ThemeSwitch'
+import CommandPalette from '@/components/ui/CommandPalette'
+import { Button } from '@/components/ui/button'
+import { Search } from 'lucide-react'
 
 const PAGE_TITLES: Record<string, string> = {
   '/':                'Admin Home',
@@ -39,24 +44,55 @@ const PAGE_TITLES: Record<string, string> = {
 export default function Layout() {
   const { pathname } = useLocation()
   const { token } = useAuthStore()
-  // Mount the WS hook for live invalidations (no-op if no token).
-  useWebSocket()
+  const [paletteOpen, setPaletteOpen] = useState(false)
 
-  useEffect(() => { void token /* dependency anchor for hook lifecycle */ }, [token])
+  useWebSocket()
+  useEffect(() => { void token }, [token])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen((o) => !o)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const exact = PAGE_TITLES[pathname]
   const base = '/' + pathname.split('/')[1]
   const title = exact || PAGE_TITLES[base] || 'Admin'
 
   return (
-    <div className="flex h-screen bg-g-bg overflow-hidden">
-      <Sidebar />
-      <div className="flex flex-col flex-1 min-w-0">
-        <Topbar title={title} />
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mx-1 h-4" />
+          <h1 className="text-sm font-semibold text-foreground">{title}</h1>
+          <div className="ml-auto flex items-center gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPaletteOpen(true)}
+              className="hidden sm:flex h-8 gap-2 text-muted-foreground"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span className="text-xs">Jump to…</span>
+              <kbd className="ml-1 hidden md:inline-flex rounded border bg-muted px-1 py-0.5 text-[10px] font-mono">
+                ⌘K
+              </kbd>
+            </Button>
+            <ThemeSwitch />
+          </div>
+        </header>
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
           <Outlet />
         </main>
-      </div>
-    </div>
+      </SidebarInset>
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
+    </SidebarProvider>
   )
 }

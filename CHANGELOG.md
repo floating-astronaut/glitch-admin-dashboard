@@ -11,9 +11,23 @@ Body text (if present) shown as indented sub-bullets.
 
 ---
 
+## 2026-05-16
+
+- **02:45 UTC** — dashboard: shadcn/ui foundation + OKLCH theme system + light/dark toggle (`b13cac6`) — 48 files
+    Brings the admin dashboard in line with the Glitch Edge app's design
+    language without rebuilding any business logic.
+    Tokens & theming
+    - New src/styles/tokens.css with OKLCH-based :root (light) + .dark
+      blocks for the full shadcn semantic palette (background / foreground
+      / card / popover / primary / secondary / muted / accent / destructive
+      / border / input / ring / chart-1..5 / sidebar*). Brand green stays
+      the primary accent in both themes — brighter in dark, gently muted
+      in light so it stays readable on white surfaces.
+    - tailwind.config.ts exposes each token as a utility colour and keeps
+
 ## 2026-05-13
 
-- **03:15 UTC** — admin/customers: Grow buyer management surface (`e41d6e7`) — 13 files
+- **03:30 UTC** — admin/customers: Grow buyer management surface (`81f4a36`) — 13 files
     New /admin/customers replaces the stale /clients page as the unified
     customer-management surface. v1 ships Grow buyers; Edge and Trade
     verticals render as disabled "soon" tabs that will light up as their

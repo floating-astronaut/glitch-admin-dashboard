@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { Activity, CheckCircle, Clock, Layers, LucideIcon } from 'lucide-react'
-import Card from '../ui/Card'
+import Card from '../ui/Surface'
 import Section from '../ui/Section'
 import EmptyState from '../ui/EmptyState'
 import KpiCard from '../ui/KpiCard'

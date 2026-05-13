@@ -1,5 +1,5 @@
 import { FileClock } from 'lucide-react'
-import Card from '../../components/ui/Card'
+import Card from '../../components/ui/Surface'
 import Section from '../../components/ui/Section'
 import EmptyState from '../../components/ui/EmptyState'
 

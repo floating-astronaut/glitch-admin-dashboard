@@ -5,7 +5,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { customersBuyers, type Buyer, type BuyerProvider } from '../../../api/grow'
 import DataTable, { Column } from '../../../components/ui/DataTable'
 import StatusBadge from '../../../components/ui/StatusBadge'
-import Card from '../../../components/ui/Card'
+import Card from '../../../components/ui/Surface'
 import ErrorState from '../../../components/ui/ErrorState'
 import clsx from 'clsx'
 

@@ -7,10 +7,10 @@ import {
   customersBuyer, customersRefund, customersResendWelcome,
   customersReinviteCodeberg, customersAddNote,
 } from '../../../api/grow'
-import Card from '../../../components/ui/Card'
+import Card from '../../../components/ui/Surface'
 import Section from '../../../components/ui/Section'
 import StatusBadge from '../../../components/ui/StatusBadge'
-import Skeleton from '../../../components/ui/Skeleton'
+import Skeleton from '../../../components/ui/SkeletonBlock'
 import ErrorState from '../../../components/ui/ErrorState'
 import FulfillmentTimeline from '../../../components/customers/FulfillmentTimeline'
 import { useState } from 'react'

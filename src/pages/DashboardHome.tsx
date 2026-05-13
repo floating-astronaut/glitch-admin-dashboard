@@ -4,7 +4,7 @@ import { getKpis, getAlerts, getActivity } from '../api/endpoints'
 import KpiCard from '../components/ui/KpiCard'
 import DataTable, { Column } from '../components/ui/DataTable'
 import StatusBadge from '../components/ui/StatusBadge'
-import Card from '../components/ui/Card'
+import Card from '../components/ui/Surface'
 import Section from '../components/ui/Section'
 import {
   Users, DollarSign, Bot, Activity, Mail,
