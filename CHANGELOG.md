@@ -13,7 +13,11 @@ Body text (if present) shown as indented sub-bullets.
 
 ## 2026-05-16
 
-- **02:45 UTC** — dashboard: shadcn/ui foundation + OKLCH theme system + light/dark toggle (`b13cac6`) — 48 files
+- **22:00 UTC** — auto-sync: 2026-05-16 22:00 UTC (`2a39755`) — 3 files
+        M	src/App.tsx
+        A	src/components/TejasOnly.tsx
+        M	src/components/layout/AppSidebar.tsx
+- **03:00 UTC** — dashboard: shadcn/ui foundation + OKLCH theme system + light/dark toggle (`3e87abf`) — 48 files
     Brings the admin dashboard in line with the Glitch Edge app's design
     language without rebuilding any business logic.
     Tokens & theming

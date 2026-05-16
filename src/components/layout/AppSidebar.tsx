@@ -31,13 +31,35 @@ import { useNavigate } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 
 interface NavItem { title: string; url: string; icon: any; end?: boolean }
-interface NavGroup { title: string; items: NavItem[] }
+interface NavGroup { title: string; items: NavItem[]; gateEmail?: string }
+
+// Email that gates the legacy engine-internals group. Anyone else
+// (other operators / future team members) sees the business-only
+// Trade group. Keep in sync with the routes' TejasOnly wrapper in
+// src/App.tsx.
+const OPERATOR_EMAIL = 'tejaskagrawalgwl@gmail.com'
 
 const NAV: NavGroup[] = [
   {
-    title: 'Trade',
+    // Business surface for the Glitch Trade subscription product.
+    // Revenue, customers, subscription state — what the operator
+    // monitors day-to-day. Backend lands in trade-api /v1/admin/*.
+    title: 'Trade · Business',
     items: [
-      { title: 'Overview',  url: '/trade', icon: LayoutDashboard, end: true },
+      { title: 'Revenue',       url: '/trade/revenue', icon: LayoutDashboard, end: true },
+      { title: 'Users',         url: '/trade/users', icon: Users },
+      { title: 'Subscriptions', url: '/trade/subscriptions', icon: CreditCard },
+    ],
+  },
+  {
+    // Engine-internals from the legacy dashboard era. Personal-use
+    // only — gated to OPERATOR_EMAIL since these surfaces expose the
+    // proprietary Snake/Ouroboros ensemble's internals and aren't
+    // shared with future operators.
+    title: 'Trade · Engine (personal)',
+    gateEmail: OPERATOR_EMAIL,
+    items: [
+      { title: 'Overview',  url: '/trade/legacy', icon: LayoutDashboard, end: true },
       { title: 'Bots',      url: '/trade/bots', icon: Bot },
       { title: 'Signals',   url: '/trade/signals', icon: Zap },
       { title: 'Trades',    url: '/trade/trades', icon: BarChart3 },
@@ -102,6 +124,13 @@ function AppSidebarGroup({ group }: { group: NavGroup }) {
       </SidebarMenu>
     </SidebarGroup>
   )
+}
+
+function FilteredNavGroups() {
+  const { user } = useAuthStore()
+  const email = (user?.email ?? '').toLowerCase()
+  const visible = NAV.filter((g) => !g.gateEmail || g.gateEmail.toLowerCase() === email)
+  return <>{visible.map((g) => <AppSidebarGroup key={g.title} group={g} />)}</>
 }
 
 function AppSidebarUser() {
@@ -174,7 +203,11 @@ export default function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {NAV.map((g) => <AppSidebarGroup key={g.title} group={g} />)}
+        {/* gateEmail filters out groups whose audience is locked to a
+            single operator (the "personal" engine views). Other admins
+            never see the link; route guards (TejasOnly in App.tsx)
+            block direct URL access. */}
+        <FilteredNavGroups />
       </SidebarContent>
       <SidebarFooter>
         <AppSidebarUser />

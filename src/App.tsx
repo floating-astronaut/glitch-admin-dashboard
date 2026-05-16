@@ -15,12 +15,22 @@ import CustomersLeads  from './pages/admin/customers/Leads'
 import BuyerDetail     from './pages/admin/customers/BuyerDetail'
 
 // Trade vertical
+//   * Trade · Business — Revenue / Users / Subscriptions. Read from
+//     trade-api /v1/admin/* (next ship). Shown to all admins.
+//   * Trade · Engine (personal) — legacy Bots / Signals / Trades / Oracle
+//     / News. Proprietary engine internals; gated to OPERATOR_EMAIL via
+//     <TejasOnly>. Sidebar also hides the links for non-Tejas users.
+import { TejasOnly } from './components/TejasOnly'
 import TradeOverview from './pages/trade/Overview'
 import TradeBots from './pages/trade/Bots'
 import TradeSignals from './pages/trade/Signals'
 import TradeTrades from './pages/trade/Trades'
 import TradeOracle from './pages/trade/Oracle'
 import TradeNews from './pages/trade/News'
+// Trade · Business pages (placeholders until /v1/admin/* lands)
+import TradeRevenue from './pages/trade/Revenue'
+import TradeUsers from './pages/trade/Users'
+import TradeSubscriptions from './pages/trade/Subscriptions'
 
 // Grow vertical
 import GrowOverview from './pages/grow/Overview'
