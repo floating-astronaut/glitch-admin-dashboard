@@ -70,13 +70,24 @@ export default function App() {
         >
           <Route index element={<DashboardHome />} />
 
-          {/* Trade vertical */}
-          <Route path="trade"          element={<TradeOverview />} />
-          <Route path="trade/bots"     element={<TradeBots />} />
-          <Route path="trade/signals"  element={<TradeSignals />} />
-          <Route path="trade/trades"   element={<TradeTrades />} />
-          <Route path="trade/oracle"   element={<TradeOracle />} />
-          <Route path="trade/news"     element={<TradeNews />} />
+          {/* Trade · Business — open to all admins. Backed by /v1/admin/*
+              on trade-api (next ship). */}
+          <Route path="trade"                element={<Navigate to="/trade/revenue" replace />} />
+          <Route path="trade/revenue"        element={<TradeRevenue />} />
+          <Route path="trade/users"          element={<TradeUsers />} />
+          <Route path="trade/subscriptions"  element={<TradeSubscriptions />} />
+
+          {/* Trade · Engine (personal) — proprietary engine internals,
+              locked to OPERATOR_EMAIL via <TejasOnly>. Sidebar hides
+              the links for everyone else. /trade/legacy is the new
+              path for the original Overview to free up /trade for
+              the business dashboard. */}
+          <Route path="trade/legacy"   element={<TejasOnly><TradeOverview /></TejasOnly>} />
+          <Route path="trade/bots"     element={<TejasOnly><TradeBots /></TejasOnly>} />
+          <Route path="trade/signals"  element={<TejasOnly><TradeSignals /></TejasOnly>} />
+          <Route path="trade/trades"   element={<TejasOnly><TradeTrades /></TejasOnly>} />
+          <Route path="trade/oracle"   element={<TejasOnly><TradeOracle /></TejasOnly>} />
+          <Route path="trade/news"     element={<TejasOnly><TradeNews /></TejasOnly>} />
 
           {/* Grow vertical */}
           <Route path="grow"               element={<GrowOverview />} />
