@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '../stores/auth'
+import { API_BASE } from '../api/client'
 
 type WsMessage = {
   channel: string
@@ -25,8 +26,11 @@ export function useWebSocket() {
     if (!token) return
     if (wsRef.current?.readyState === WebSocket.OPEN) return
 
-    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const url = `${proto}//${window.location.host}/ws?token=${encodeURIComponent(token)}`
+    // Resolve the WS endpoint off API_BASE so cross-origin works once
+    // the SPA moves to CF Pages (window.location.host = CF edge, but
+    // /ws lives on admin-api.glitchexecutor.com). https → wss.
+    const wsBase = API_BASE.replace(/^http/, 'ws')
+    const url = `${wsBase}/ws?token=${encodeURIComponent(token)}`
     const ws = new WebSocket(url)
     wsRef.current = ws
 
