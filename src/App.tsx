@@ -2,7 +2,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './stores/auth'
 import Layout from './components/layout/Layout'
 import Login from './pages/Login'
-import DashboardHome from './pages/DashboardHome'
+// `/` is the System › Today overview per docs/ADMIN_IA.md §1. The
+// pre-app-era `DashboardHome.tsx` was retired in ADMIN-1c — it
+// mixed Trade engine KPIs, customer counts, and MRR into a single
+// landing card grid, which violated the ownership boundary in the
+// IA's appendix invariants. `system/Today.tsx` replaces it.
+import Today from './pages/system/Today'
 import Billing         from './pages/system/Billing'
 import Infrastructure  from './pages/system/Infrastructure'
 import Settings        from './pages/system/Settings'
@@ -68,7 +73,7 @@ export default function App() {
             </AuthGuard>
           }
         >
-          <Route index element={<DashboardHome />} />
+          <Route index element={<Today />} />
 
           {/* Trade · Business — open to all admins. Backed by /v1/admin/*
               on trade-api (next ship). */}

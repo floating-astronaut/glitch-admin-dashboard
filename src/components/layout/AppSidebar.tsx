@@ -91,7 +91,7 @@ const NAV: NavGroup[] = [
     // /system/* namespace.
     title: 'System',
     items: [
-      { title: 'Home',            url: '/', icon: LayoutDashboard, end: true },
+      { title: 'Today',           url: '/', icon: LayoutDashboard, end: true },
       { title: 'Customers',       url: '/system/customers', icon: Users },
       { title: 'Billing',         url: '/system/billing', icon: CreditCard },
       { title: 'Infrastructure',  url: '/system/infrastructure', icon: Server },

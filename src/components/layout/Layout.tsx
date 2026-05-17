@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Search } from 'lucide-react'
 
 const PAGE_TITLES: Record<string, string> = {
-  '/':                'Admin Home',
+  '/':                'System · Today',
   '/trade':           'Trade · Overview',
   '/trade/bots':      'Trade · Bots',
   '/trade/signals':   'Trade · Signals',

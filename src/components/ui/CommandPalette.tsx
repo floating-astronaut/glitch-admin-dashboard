@@ -40,7 +40,7 @@ const COMMANDS: Cmd[] = [
   { group: 'Grow', label: 'SEO Agent', to: '/grow/seo', icon: Search },
   { group: 'Grow', label: 'Voice / COD Agent', to: '/grow/voice', icon: PhoneCall },
   { group: 'Edge', label: 'Edge · Betting', to: '/edge', icon: Target },
-  { group: 'System', label: 'Home', to: '/', icon: LayoutDashboard },
+  { group: 'System', label: 'Today', to: '/', icon: LayoutDashboard },
   { group: 'System', label: 'Customers', to: '/system/customers', icon: Users },
   { group: 'System', label: 'Customers · Leads', to: '/system/customers/leads', icon: Users },
   { group: 'System', label: 'Billing', to: '/system/billing', icon: CreditCard },
