@@ -8,16 +8,19 @@ import Login from './pages/Login'
 // landing card grid, which violated the ownership boundary in the
 // IA's appendix invariants. `system/Today.tsx` replaces it.
 import Today from './pages/system/Today'
-import Billing         from './pages/system/Billing'
 import Infrastructure  from './pages/system/Infrastructure'
 import Settings        from './pages/system/Settings'
 import ControlCentre   from './pages/system/ControlCentre'
 import UserManagement  from './pages/system/UserManagement'
 import AuditLogs       from './pages/system/AuditLogs'
-import CustomersLayout from './pages/system/customers/Layout'
-import CustomersBuyers from './pages/system/customers/Buyers'
-import CustomersLeads  from './pages/system/customers/Leads'
-import BuyerDetail     from './pages/system/customers/BuyerDetail'
+// Customers + Billing relocated under their owning verticals in
+// ADMIN-RELOC-1 per the v1.1 ownership rule. /system/* paths
+// redirect below; bookmarks survive.
+import CustomersLayout from './pages/grow/customers/Layout'
+import CustomersBuyers from './pages/grow/customers/Buyers'
+import CustomersLeads  from './pages/grow/customers/Leads'
+import BuyerDetail     from './pages/grow/customers/BuyerDetail'
+import TradeBilling    from './pages/trade/Billing'
 
 // Trade vertical
 //   * Trade · Business — Revenue / Users / Subscriptions. Read from
@@ -91,6 +94,7 @@ export default function App() {
           <Route path="trade/revenue"        element={<TradeRevenue />} />
           <Route path="trade/users"          element={<TradeUsers />} />
           <Route path="trade/subscriptions"  element={<TradeSubscriptions />} />
+          <Route path="trade/billing"        element={<TradeBilling />} />
 
           {/* Trade · Engine (personal) — proprietary engine internals,
               locked to OPERATOR_EMAIL via <TejasOnly>. Sidebar hides
@@ -128,6 +132,15 @@ export default function App() {
           <Route path="grow/seo"           element={<SeoAgentOverview />} />
           <Route path="grow/voice"         element={<VoiceAgentOverview />} />
 
+          {/* Grow · Customers — relocated from /system/customers in
+              ADMIN-RELOC-1 per the v1.1 ownership rule. /system/customers
+              redirects below for legacy nav. */}
+          <Route path="grow/customers" element={<CustomersLayout />}>
+            <Route index                    element={<CustomersBuyers />} />
+            <Route path="leads"             element={<CustomersLeads />} />
+            <Route path="buyers/:paymentId" element={<BuyerDetail />} />
+          </Route>
+
           {/* Legacy /grow/budz/* → /grow/sales/budz/* */}
           <Route path="grow/budz"         element={<Navigate to="/grow/sales/budz" replace />} />
           <Route path="grow/budz/leads"   element={<Navigate to="/grow/sales/budz/leads" replace />} />
@@ -139,27 +152,30 @@ export default function App() {
           <Route path="edge"              element={<EdgeOverview />} />
           <Route path="edge/betting"      element={<EdgeBetting />} />
 
-          {/* System (cross-cutting). Renamed from "Admin" per ADMIN_IA §1. */}
-          <Route path="system/customers" element={<CustomersLayout />}>
-            <Route index                          element={<CustomersBuyers />} />
-            <Route path="leads"                   element={<CustomersLeads />} />
-            <Route path="buyers/:paymentId"       element={<BuyerDetail />} />
-          </Route>
-          <Route path="system/billing"         element={<Billing />} />
+          {/* System (cross-cutting). Renamed from "Admin" per ADMIN_IA §1.
+              Customers + Billing relocated to their owning verticals in
+              ADMIN-RELOC-1; legacy redirects below preserve bookmarks. */}
           <Route path="system/infrastructure"  element={<Infrastructure />} />
           <Route path="system/settings"        element={<Settings />} />
           <Route path="system/control-centre"  element={<ControlCentre />} />
           <Route path="system/users"           element={<UserManagement />} />
           <Route path="system/audit-logs"      element={<AuditLogs />} />
 
-          {/* Legacy redirects — preserve nav from bookmarks / external links. */}
-          <Route path="clients"               element={<Navigate to="/system/customers" replace />} />
-          <Route path="clients/:id"           element={<Navigate to="/system/customers" replace />} />
-          <Route path="billing"               element={<Navigate to="/system/billing" replace />} />
+          {/* RELOC-1 legacy redirects — Customers + Billing moved out. */}
+          <Route path="system/customers"                 element={<Navigate to="/grow/customers"       replace />} />
+          <Route path="system/customers/leads"           element={<Navigate to="/grow/customers/leads" replace />} />
+          <Route path="system/customers/buyers/:paymentId" element={<Navigate to="/grow/customers"     replace />} />
+          <Route path="system/billing"                   element={<Navigate to="/trade/billing"        replace />} />
+
+          {/* Legacy redirects — preserve nav from bookmarks / external links.
+              Customers + Billing redirects target the new RELOC-1 locations. */}
+          <Route path="clients"               element={<Navigate to="/grow/customers" replace />} />
+          <Route path="clients/:id"           element={<Navigate to="/grow/customers" replace />} />
+          <Route path="billing"               element={<Navigate to="/trade/billing" replace />} />
           <Route path="infrastructure"        element={<Navigate to="/system/infrastructure" replace />} />
           <Route path="settings"              element={<Navigate to="/system/settings" replace />} />
-          <Route path="admin/customers"       element={<Navigate to="/system/customers" replace />} />
-          <Route path="admin/customers/leads" element={<Navigate to="/system/customers/leads" replace />} />
+          <Route path="admin/customers"       element={<Navigate to="/grow/customers" replace />} />
+          <Route path="admin/customers/leads" element={<Navigate to="/grow/customers/leads" replace />} />
           <Route path="admin/control-centre"  element={<Navigate to="/system/control-centre" replace />} />
           <Route path="admin/users"           element={<Navigate to="/system/users" replace />} />
           <Route path="admin/audit-logs"      element={<Navigate to="/system/audit-logs" replace />} />

@@ -127,7 +127,7 @@ export default function CustomersBuyers() {
             loading={isLoading}
             emptyText="No buyers match these filters"
             dateField="created_at"
-            onRowClick={(b: Buyer) => navigate(`/system/customers/buyers/${encodeURIComponent(b.payment_id)}`)}
+            onRowClick={(b: Buyer) => navigate(`/grow/customers/buyers/${encodeURIComponent(b.payment_id)}`)}
           />
         </div>
       )}

@@ -23,6 +23,7 @@ interface Cmd {
 
 const COMMANDS: Cmd[] = [
   { group: 'Trade', label: 'Trade · Overview', to: '/trade', icon: LayoutDashboard },
+  { group: 'Trade', label: 'Trade · Billing', to: '/trade/billing', icon: CreditCard },
   { group: 'Trade', label: 'Trade · Engine', to: '/trade/engine', icon: LayoutDashboard },
   { group: 'Trade', label: 'Trade · Bots', to: '/trade/bots', icon: Bot },
   { group: 'Trade', label: 'Trade · Signals', to: '/trade/signals', icon: Zap },
@@ -30,6 +31,8 @@ const COMMANDS: Cmd[] = [
   { group: 'Trade', label: 'Trade · Oracle', to: '/trade/oracle', icon: Shield },
   { group: 'Trade', label: 'Trade · News', to: '/trade/news', icon: Newspaper },
   { group: 'Grow', label: 'Grow · Command Center', to: '/grow', icon: Sprout },
+  { group: 'Grow', label: 'Grow · Customers', to: '/grow/customers', icon: Users },
+  { group: 'Grow', label: 'Grow · Customers · Leads', to: '/grow/customers/leads', icon: Users },
   { group: 'Grow', label: 'Sales Agent', to: '/grow/sales', icon: MessageSquare },
   { group: 'Grow', label: 'Sales · Glitch Budz', to: '/grow/sales/budz', icon: MessageSquare },
   { group: 'Grow', label: 'Sales · Budz · Leads', to: '/grow/sales/budz/leads', icon: Users },
@@ -47,9 +50,6 @@ const COMMANDS: Cmd[] = [
   { group: 'Edge', label: 'Edge · Platform', to: '/edge',         icon: LayoutDashboard },
   { group: 'Edge', label: 'Edge · Betting',  to: '/edge/betting', icon: Target },
   { group: 'System', label: 'Today', to: '/', icon: LayoutDashboard },
-  { group: 'System', label: 'Customers', to: '/system/customers', icon: Users },
-  { group: 'System', label: 'Customers · Leads', to: '/system/customers/leads', icon: Users },
-  { group: 'System', label: 'Billing', to: '/system/billing', icon: CreditCard },
   { group: 'System', label: 'Infrastructure', to: '/system/infrastructure', icon: Server },
   { group: 'System', label: 'Control Centre', to: '/system/control-centre', icon: LayoutGrid },
   { group: 'System', label: 'User Management', to: '/system/users', icon: ShieldCheck },

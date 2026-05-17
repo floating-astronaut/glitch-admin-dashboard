@@ -49,6 +49,9 @@ const NAV: NavGroup[] = [
       { title: 'Revenue',       url: '/trade/revenue', icon: LayoutDashboard, end: true },
       { title: 'Users',         url: '/trade/users', icon: Users },
       { title: 'Subscriptions', url: '/trade/subscriptions', icon: CreditCard },
+      // Billing relocated from System in ADMIN-RELOC-1 — the data is
+      // Trade-SaaS subscriber billing (MRR / ARR / plans / signups).
+      { title: 'Billing',       url: '/trade/billing', icon: CreditCard },
     ],
   },
   {
@@ -73,6 +76,10 @@ const NAV: NavGroup[] = [
     title: 'Grow',
     items: [
       { title: 'Overview',     url: '/grow', icon: Sprout, end: true },
+      // Customers relocated from System in ADMIN-RELOC-1 (Grow is the
+      // primary buyer source today). Trade subscribers live under
+      // Trade · Business; Edge accounts under Edge.
+      { title: 'Customers',    url: '/grow/customers', icon: Users },
       { title: 'Sales Agent',  url: '/grow/sales', icon: MessageSquare },
       { title: 'Ads Agent',    url: '/grow/ads', icon: Megaphone },
       { title: 'Social Agent', url: '/grow/social', icon: Share2 },
@@ -92,13 +99,14 @@ const NAV: NavGroup[] = [
   },
   {
     // Renamed from "Admin" per ADMIN_IA §1: System is a peer of Trade /
-    // Grow / Edge, not a meta-layer above them. URLs follow the same
-    // /system/* namespace.
+    // Grow / Edge, not a meta-layer above them. v1.1 ownership rule:
+    // System carries shared platform/ops only — customer + billing
+    // surfaces relocated to their owning verticals in ADMIN-RELOC-1.
+    // "User Management" here is *admin/operator* users, NOT customer
+    // users (those live under each vertical).
     title: 'System',
     items: [
       { title: 'Today',           url: '/', icon: LayoutDashboard, end: true },
-      { title: 'Customers',       url: '/system/customers', icon: Users },
-      { title: 'Billing',         url: '/system/billing', icon: CreditCard },
       { title: 'Infrastructure',  url: '/system/infrastructure', icon: Server },
       { title: 'Control Centre',  url: '/system/control-centre', icon: LayoutGrid },
       { title: 'User Management', url: '/system/users', icon: ShieldCheck },
