@@ -50,6 +50,14 @@ import BudzOverview from './pages/grow/sales/budz/Overview'
 import BudzLeads    from './pages/grow/sales/budz/Leads'
 import BudzDrafts   from './pages/grow/sales/budz/Drafts'
 import BudzSends    from './pages/grow/sales/budz/Sends'
+// Ads · BSK-002 deployment shell (active Phase-1 commercial wedge:
+// Shopify D2C India). Preview surface — customer-level data lands
+// once the ads-agent operator API ships.
+import AdsBsk002Layout    from './pages/grow/ads/bsk002/Layout'
+import AdsBsk002Overview  from './pages/grow/ads/bsk002/Overview'
+import AdsBsk002Campaigns from './pages/grow/ads/bsk002/Campaigns'
+import AdsBsk002Creatives from './pages/grow/ads/bsk002/Creatives'
+import AdsBsk002Reports   from './pages/grow/ads/bsk002/Reports'
 
 // Edge vertical
 import EdgeOverview from './pages/edge/Overview'
@@ -104,6 +112,12 @@ export default function App() {
             <Route path="sends"    element={<BudzSends />} />
           </Route>
           <Route path="grow/ads"           element={<AdsAgentOverview />} />
+          <Route path="grow/ads/bsk002" element={<AdsBsk002Layout />}>
+            <Route index             element={<AdsBsk002Overview />} />
+            <Route path="campaigns"  element={<AdsBsk002Campaigns />} />
+            <Route path="creatives"  element={<AdsBsk002Creatives />} />
+            <Route path="reports"    element={<AdsBsk002Reports />} />
+          </Route>
           <Route path="grow/social"        element={<SocialAgentOverview />} />
           <Route path="grow/ugc"           element={<UgcAgentOverview />} />
           <Route path="grow/seo"           element={<SeoAgentOverview />} />
