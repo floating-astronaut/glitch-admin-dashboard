@@ -42,6 +42,8 @@ import TradeSubscriptions from './pages/trade/Subscriptions'
 
 // Grow vertical
 import GrowOverview from './pages/grow/Overview'
+import GrowUsers   from './pages/grow/Users'
+import GrowBilling from './pages/grow/Billing'
 import SalesAgentOverview from './pages/grow/sales/Overview'
 import AdsAgentOverview from './pages/grow/ads/Overview'
 import SocialAgentOverview from './pages/grow/social/Overview'
@@ -64,8 +66,11 @@ import AdsBsk002Reports   from './pages/grow/ads/bsk002/Reports'
 
 // Edge vertical — split into Overview (platform health, /edge) and
 // Betting (accounts/positions/signals, /edge/betting) per ADMIN-1e.
+// Users + Billing are SHELLS-1 preview surfaces.
 import EdgeOverview from './pages/edge/Overview'
 import EdgeBetting  from './pages/edge/Betting'
+import EdgeUsers    from './pages/edge/Users'
+import EdgeBilling  from './pages/edge/Billing'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -140,6 +145,9 @@ export default function App() {
             <Route path="leads"             element={<CustomersLeads />} />
             <Route path="buyers/:paymentId" element={<BuyerDetail />} />
           </Route>
+          {/* Grow · Users + Billing — SHELLS-1 preview surfaces. */}
+          <Route path="grow/users"   element={<GrowUsers />} />
+          <Route path="grow/billing" element={<GrowBilling />} />
 
           {/* Legacy /grow/budz/* → /grow/sales/budz/* */}
           <Route path="grow/budz"         element={<Navigate to="/grow/sales/budz" replace />} />
@@ -148,9 +156,12 @@ export default function App() {
           <Route path="grow/budz/sends"   element={<Navigate to="/grow/sales/budz/sends" replace />} />
 
           {/* Edge vertical — /edge is the platform overview, /edge/betting
-              is the betting accounts / positions / signals surface. */}
+              is the betting accounts / positions / signals surface.
+              /edge/users + /edge/billing are SHELLS-1 preview surfaces. */}
           <Route path="edge"              element={<EdgeOverview />} />
           <Route path="edge/betting"      element={<EdgeBetting />} />
+          <Route path="edge/users"        element={<EdgeUsers />} />
+          <Route path="edge/billing"      element={<EdgeBilling />} />
 
           {/* System (cross-cutting). Renamed from "Admin" per ADMIN_IA §1.
               Customers + Billing relocated to their owning verticals in

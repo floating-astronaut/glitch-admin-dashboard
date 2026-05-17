@@ -76,10 +76,13 @@ const NAV: NavGroup[] = [
     title: 'Grow',
     items: [
       { title: 'Overview',     url: '/grow', icon: Sprout, end: true },
-      // Customers relocated from System in ADMIN-RELOC-1 (Grow is the
-      // primary buyer source today). Trade subscribers live under
-      // Trade · Business; Edge accounts under Edge.
+      // Customers / Users / Billing — business-operator items for the
+      // Grow vertical. Customers landed in RELOC-1; Users + Billing
+      // are SHELLS-1 preview surfaces. Grow has its own app database
+      // for users + billing per the v1.1 ownership rule.
       { title: 'Customers',    url: '/grow/customers', icon: Users },
+      { title: 'Users',        url: '/grow/users', icon: Users },
+      { title: 'Billing',      url: '/grow/billing', icon: CreditCard },
       { title: 'Sales Agent',  url: '/grow/sales', icon: MessageSquare },
       { title: 'Ads Agent',    url: '/grow/ads', icon: Megaphone },
       { title: 'Social Agent', url: '/grow/social', icon: Share2 },
@@ -91,10 +94,14 @@ const NAV: NavGroup[] = [
   {
     // Split per ADMIN-1e: /edge is the platform-health Overview,
     // /edge/betting is the betting accounts/positions surface.
+    // Users + Billing are SHELLS-1 preview surfaces (Edge has its own
+    // app database for users per the v1.1 ownership rule).
     title: 'Edge',
     items: [
       { title: 'Overview', url: '/edge',         icon: LayoutDashboard, end: true },
       { title: 'Betting',  url: '/edge/betting', icon: Target },
+      { title: 'Users',    url: '/edge/users',   icon: Users },
+      { title: 'Billing',  url: '/edge/billing', icon: CreditCard },
     ],
   },
   {

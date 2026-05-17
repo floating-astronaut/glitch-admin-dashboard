@@ -1,6 +1,6 @@
 # ADMIN_IA — Glitch Admin Dashboard Information Architecture
 
-Status: **LOCKED v1.2** (2026-05-17 — RELOC-1 shipped)
+Status: **LOCKED v1.3** (2026-05-17 — SHELLS-1 shipped)
 Owner: Tejas
 Scope: ADMIN-1a — define the control-panel shape, audit current pages, and
 sequence the rewrite. No source edits in this ticket.
@@ -15,6 +15,13 @@ History:
   `/system/customers/*` moved to `/grow/customers/*`; `/system/billing`
   moved to `/trade/billing`. Transitional tags removed. Legacy paths
   redirect for bookmark survival.
+- v1.3 (2026-05-17) — `ADMIN-SHELLS-1` shipped the four deferred
+  preview shells: `/grow/users`, `/grow/billing`, `/edge/users`,
+  `/edge/billing`. Per the operator's clarification that Grow and
+  Edge each have their own app + database for users, these surfaces
+  now hold space in the IA, modeled on the Ads BSK-002 preview
+  pattern. Each shell is an EmptyState that names the upstream
+  blocker (operator API on the respective app).
 
 This file is the contract the rest of the admin-dashboard rewrite is built
 against. Subsequent ADMIN tickets (1b, 1c, …) must either conform to this
@@ -246,6 +253,65 @@ These hold across every ticket above:
 
 This section records every change to this IA after its initial lock.
 Entries are in reverse-chronological order.
+
+### 2026-05-17 — v1.3 SHELLS-1 shipped (per-vertical user + billing preview shells)
+
+**Trigger.** Operator follow-on after RELOC-1: "okay go ahead" on
+the standing offer to build the four deferred placeholder shells
+documented in v1.2's §6. Direct realization of the operator's
+earlier clarification that *"grow and edge have their own app, own
+database for users"*.
+
+**What shipped.** Four single-file preview shells modeled on the Ads
+BSK-002 template — header card + EmptyState that names the upstream
+blocker:
+
+- `src/pages/grow/Users.tsx`    → `/grow/users`
+- `src/pages/grow/Billing.tsx`  → `/grow/billing`
+- `src/pages/edge/Users.tsx`    → `/edge/users`
+- `src/pages/edge/Billing.tsx`  → `/edge/billing`
+
+Each makes the operator/admin distinction explicit:
+*Grow · Users* and *Edge · Users* are operator views of the
+**customer-user databases owned by those apps**, not admin operators
+(those still live at `/system/users`).
+
+*Routes (`App.tsx`).* Four new live routes wired under the Grow and
+Edge groups. No new redirects needed (these paths didn't exist
+before).
+
+*Sidebar (`AppSidebar.tsx`).*
+- **Grow** group: new Users + Billing items, placed right after
+  Customers so the business-operator items (Customers / Users /
+  Billing) sit together above the agent shells.
+- **Edge** group: new Users + Billing items, after Betting.
+
+*Chrome.* `Layout.tsx` PAGE_TITLES gained four entries
+(`Grow · Users`, `Grow · Billing`, `Edge · Users`, `Edge · Billing`).
+`CommandPalette.tsx` gained four matching commands.
+
+*IA doc.* Header bumped `v1.2 → v1.3`. History block updated.
+v1.2's "Deferred follow-ups" list is now realized; the deferred
+candidates section in §6 v1.2 entry is informational history.
+
+**Verification** (skill `superpowers:verification-before-completion`)
+- `vite build` clean (`✓ built in 12.52s`); bundle +0.74 kB gzip
+  (300.25 vs 299.51) — four small shells.
+- Per the verification-policy memory, additive preview shells with
+  no data fetches, no public writes, and no auth changes close on
+  clean build.
+
+**What did NOT change.**
+- No backend / schema work. No operator APIs added; the shells stay
+  on EmptyState until those upstream surfaces ship.
+- No relocation or rewrite of existing pages. Pure additive.
+
+**Remaining ADMIN-family candidates (NOT auto-promoted):**
+
+- SSO login/logout polish for the admin shell (mirror GROW-SHELL-1).
+- Audit + Lead detail pages (deferred at `customer-mgmt-design.md`).
+- Cross-repo work for live ads-agent + edge-api operator data is
+  outside the ADMIN family and needs explicit reassignment.
 
 ### 2026-05-17 — v1.2 RELOC-1 shipped (Customers + Billing physically moved)
 
