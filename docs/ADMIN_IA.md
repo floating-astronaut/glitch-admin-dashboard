@@ -1,9 +1,19 @@
 # ADMIN_IA — Glitch Admin Dashboard Information Architecture
 
-Status: **LOCKED v1** (2026-05-17)
+Status: **LOCKED v1.1** (2026-05-17 reconciled)
 Owner: Tejas
 Scope: ADMIN-1a — define the control-panel shape, audit current pages, and
 sequence the rewrite. No source edits in this ticket.
+
+History:
+- v1 (2026-05-17) — original lock under ADMIN-1a.
+- v1.1 (2026-05-17) — reconciled with the **2026-05-17 supervisor
+  ownership clarification**: business-operational data (customers,
+  billing, customer users) belongs under its owning vertical, not
+  under System. System carries shared platform/ops only. Customers
+  and Billing are marked **transitional** in §2/§3; the ownership
+  rule is codified as an Appendix invariant; the full reconciliation
+  is logged in §6 at the bottom of this file.
 
 This file is the contract the rest of the admin-dashboard rewrite is built
 against. Subsequent ADMIN tickets (1b, 1c, …) must either conform to this
@@ -21,7 +31,22 @@ They are peers — not nested, not collapsible into one "agents" group.
 | 1 | Trade   | Glitch Trade SaaS — revenue / customers / engine     | All admins + operator (engine) |
 | 2 | Grow    | Glitch Grow agent suite — Sales / Ads / Social / UGC / SEO / Voice | All admins per brand |
 | 3 | Edge    | Glitch Edge betting platform — accounts / signals    | All admins          |
-| 4 | System  | Cross-cutting admin — customers, billing, infra, users, audit | All admins          |
+| 4 | System  | Shared platform/ops — health, logs, infra, audit, admin users, control toggles, settings | All admins          |
+
+**Ownership rule** (codified 2026-05-17, v1.1 reconciliation):
+business-operational data — customer accounts, customer billing,
+customer subscriptions, lead pipelines, per-vertical revenue —
+**belongs under its owning vertical**, not under System. System
+carries cross-product platform/ops only: health, logs, alerts,
+queues, runtime visibility, infrastructure status, admin (operator)
+users, audit log, global control toggles, settings.
+
+The existing `/system/customers` and `/system/billing` surfaces are
+**transitional**: they were placed under System when this IA first
+locked, before the ownership clarification. Their eventual placement
+is per-vertical (Trade buyers under `/trade/*`, Grow buyers under
+`/grow/*`, Edge accounts under `/edge/*`). Relocation is its own
+future lane, not part of the ADMIN-1\* sequence.
 
 Rename note: today's sidebar labels the 4th group **"Admin"**. Lock the
 new name **"System"** to free the word "Admin" for the *role* (versus
@@ -81,11 +106,15 @@ Edge                       (all admins)
 
 System                     (renamed from "Admin")
    Today           ← /
-   Customers       ← cross-vertical buyer list
-   Billing         ← platform invoices + per-vertical roll-up
+   Customers       ← TRANSITIONAL · cross-vertical buyer list;
+                     relocates per the ownership rule
+   Billing         ← TRANSITIONAL · per-vertical revenue belongs under
+                     each vertical, not System
    Infrastructure  ← service heartbeat board
    Control Centre  ← global toggles, kill switches
-   Users           ← admin accounts + roles
+   Users           ← admin (operator) accounts + roles
+                     · NOT customer users — those belong to the
+                     owning vertical's Users tab (e.g. /trade/users)
    Audit Logs
    Settings
 ```
@@ -105,16 +134,16 @@ Page → keep / rename / merge / retire. File paths are relative to
 |--------------|------|------:|----------|-------|
 | `/` | `DashboardHome.tsx` | 191 | **Rebuild (rename)** | Today's home queries a pre-app-era unified `/api/kpis` and mixes Trade engine + customers + MRR. Rebuild as **System › Today**, sourcing each KPI from the relevant vertical API. Stop linking to `/trade` and `/clients` (legacy paths). |
 | `/login` | `Login.tsx` | 87 | **Keep** | Auth gate; SSO-backed. No structural change. |
-| `/billing` | `Billing.tsx` | 124 | **Rename → `system/Billing`** | Move file to `pages/system/Billing.tsx`. Re-scope to *platform* billing; per-vertical revenue stays under each surface's "Revenue" tab. |
+| `/billing` | `Billing.tsx` | 124 | **Rename → `system/Billing`** *(transitional, v1.1)* | Move file to `pages/system/Billing.tsx`. Re-scope to *platform* billing; per-vertical revenue stays under each surface's "Revenue" tab. Per the ownership rule, the surviving customer-billing summary fields belong under each vertical (Trade billing under `/trade/*`, Grow billing under `/grow/*`). Relocation lane TBD. |
 | `/infrastructure` | `Infrastructure.tsx` | 159 | **Rename → `system/Infrastructure`** | Move; otherwise keep. Source of truth is `/home/support/glitch-infra/README.md` — make sure cards match. |
 | `/settings` | `Settings.tsx` | 224 | **Rename → `system/Settings`** | Move; review for stale fields tied to the legacy `admin_api`. |
 | `/admin/control-centre` | `admin/ControlCentre.tsx` | 323 | **Rename → `system/ControlCentre`** | Largest System page; keep behaviour, just move the file. |
 | `/admin/users` | `admin/UserManagement.tsx` | 477 | **Rename → `system/UserManagement`** | Same. |
 | `/admin/audit-logs` | `admin/AuditLogs.tsx` | 32 | **Build out (rename)** | Stub today. Move to `system/AuditLogs` and wire to real audit feed (admin_api → SSO action log). |
-| `/admin/customers` (index) | `admin/customers/Buyers.tsx` | 136 | **Keep, rename group → `system/customers`** | This is the canonical buyer surface. |
-| `/admin/customers/leads` | `admin/customers/Leads.tsx` | 13 | **Build out** | 13-line stub. Wire to lead pipeline (Grow › Sales originates these). |
-| `/admin/customers/buyers/:paymentId` | `admin/customers/BuyerDetail.tsx` | 252 | **Keep** | Substantive; biggest System detail view. |
-| `/admin/customers/*` layout | `admin/customers/Layout.tsx` | 88 | **Keep** | Move with the group. |
+| `/admin/customers` (index) | `admin/customers/Buyers.tsx` | 136 | **Keep, rename group → `system/customers`** *(transitional, v1.1)* | Canonical buyer surface today. Per the ownership rule, this belongs under its owning vertical(s) — Trade buyers under `/trade/customers` or split, Grow buyers under `/grow/customers`, Edge accounts under `/edge/*`. The current `system/customers/Layout.tsx` already has Grow/Edge/Trade tabs prepared for that split. Relocation lane TBD. |
+| `/admin/customers/leads` | `admin/customers/Leads.tsx` | 13 | **Build out** *(transitional, v1.1)* | 13-line stub. Wire to lead pipeline (Grow › Sales originates these). Relocates with the parent Customers surface. |
+| `/admin/customers/buyers/:paymentId` | `admin/customers/BuyerDetail.tsx` | 252 | **Keep** *(transitional, v1.1)* | Substantive; biggest System detail view. Relocates with the parent Customers surface. |
+| `/admin/customers/*` layout | `admin/customers/Layout.tsx` | 88 | **Keep** *(transitional, v1.1)* | Move with the group. Already has Grow/Edge/Trade tabs, prepared for the per-vertical split. |
 | `/clients`, `/clients/:id` | (redirect only) | — | **Keep redirect, retire backing files** | Backing pages `Clients.tsx` (128) and `ClientDetail.tsx` (251) are no longer imported. Redirects in `App.tsx` already point to `/admin/customers`. Delete the dead files. |
 | `/trade` (redirect) | — | — | **Keep** | Redirects to `/trade/revenue`. Correct. |
 | `/trade/revenue` | `trade/Revenue.tsx` | 109 | **Keep** | Placeholder UI; awaiting trade-api `/v1/admin/revenue`. |
@@ -162,23 +191,25 @@ They either no longer match the IA or query collapsed backends.
 
 ---
 
-## 5. Recommended next implementation sequence
+## 5. Implementation sequence — status
 
 Sequenced for minimum churn — folder moves first, then dead-code delete,
-then build-outs. Each item is sized so it can ship as one PR.
+then build-outs. **All six tickets shipped 2026-05-17.**
 
-| Ticket | Title | Scope | Risk |
-|--------|-------|-------|------|
-| **ADMIN-1b** | Rename `pages/admin/*` → `pages/system/*`, drop dead files | Move ControlCentre / UserManagement / AuditLogs / customers/* into `pages/system/`. Move root-level Billing / Infrastructure / Settings under `pages/system/`. Update imports in `App.tsx` and the sidebar group label "Admin" → "System". Delete `Clients.tsx` and `ClientDetail.tsx` (redirects already in place). | Low — pure rename + dead-code delete. No behaviour change. |
-| **ADMIN-1c** | Rebuild `/` as **System › Today** | Replace `DashboardHome.tsx` with a System overview sourced from per-vertical APIs (`/v1/admin/*` on trade-api once it lands; Grow command-centre endpoint; edge-api heartbeat; system/alerts). Stop importing `/api/kpis`. | Medium — touches the landing surface; needs the live endpoints reachable. |
-| **ADMIN-1d** | Build out Grow agent shells | Apply the Budz `Layout` + tab pattern to Ads / Social / UGC / SEO / Voice agent Overviews. Wire to whichever backends exist; placeholder where they don't. Ads first (Phase 1 wedge). | Medium — five surfaces, but each is small. |
-| **ADMIN-1e** | Split `/edge` vs `/edge/betting` and wire to `glitch-edge-api` | `/edge` becomes the Overview (health, revenue, latency), `/edge/betting` becomes the accounts/positions surface. Backed by edge-api on the US box (port 3109). | Medium — first real edge-api consumer in the dashboard. |
-| **ADMIN-1f** | Audit Logs + cross-Grow Leads aggregate | Replace the two stubs (`AuditLogs.tsx`, `customers/Leads.tsx`) with real implementations. | Low — additive. |
-| **ADMIN-1g** | Rename `/trade/legacy` → `/trade/engine` | Cosmetic but lasting. Add redirect for the old path. Out of scope until 1b–1f land. | Low. |
+| Ticket | Title | Status | Commit |
+|--------|-------|--------|--------|
+| **ADMIN-1b** | Rename `pages/admin/*` → `pages/system/*`, drop dead files | ✅ done | `817300f` |
+| **ADMIN-1c** | Rebuild `/` as **System › Today** | ✅ done | `3f5f00e` + `6ac6671` |
+| **ADMIN-1d** | Build out Grow agent shells (Ads first; Social/UGC/SEO/Voice parity) | ✅ done | `f911703` |
+| **ADMIN-1e** | Split `/edge` vs `/edge/betting` and wire to `glitch-edge-api` | ✅ done | `b263a93` |
+| **ADMIN-1f** | Audit Logs + Customers Leads build-out | ✅ done | `136d346` |
+| **ADMIN-1g** | Rename `/trade/legacy` → `/trade/engine` | ✅ done | `f01ca0f` |
 
 Do **not** start the broad UI rewrite (theme polish, density pass,
-component-library sweep) until 1b–1e are complete. Cosmetic work on
-pages that will be moved or rebuilt is throwaway.
+component-library sweep) until the operator explicitly opens that
+lane. The Customers + Billing relocation under the v1.1 ownership
+rule (see §6) is a separate lane and is **not** part of this
+sequence.
 
 ---
 
@@ -192,7 +223,82 @@ These hold across every ticket above:
   `gateEmail` filter.** Both layers must be set; route guard alone is
   not enough because the link would still render.
 - **Within-surface depth ≤ 3.** Push further nesting into in-page tabs.
+- **Ownership rule (v1.1, 2026-05-17):** business-operational data
+  — customer accounts, customer billing, customer subscriptions,
+  lead pipelines, per-vertical revenue — lives under its owning
+  vertical. System carries shared platform/ops only (health, logs,
+  infra, audit, admin/operator users, control toggles, settings).
+  *Customer* users and *admin* users are distinct: customer users
+  belong to the vertical that sold them (e.g. `/trade/users`); admin
+  users stay under `/system/users`.
 - **Per-vertical Revenue lives under that vertical**, not under System
-  › Billing. System › Billing is platform-level only.
+  › Billing. System › Billing is platform-level only (subsumed under
+  the ownership rule above).
 - **Stub pages are tracked in this doc**, not silently shipped. If a
   new scaffold lands, it must appear in §4 with an action.
+
+---
+
+## 6. Reconciliation log
+
+This section records every change to this IA after its initial lock.
+Entries are in reverse-chronological order.
+
+### 2026-05-17 — v1.1 reconciliation against the supervisor ownership clarification
+
+**Trigger.** The supervisor inserted an admin-dashboard ownership
+clarification before promoting ADMIN-1c: *"User, billing, and similar
+business-operational data should live under the relevant vertical,
+not under System. System is reserved for shared platform/ops concerns
+only — server health, logs, infrastructure status, queues, runtime
+visibility, and similar cross-product operational surfaces."* That
+clarification contradicted the v1 placement of Customers + Billing
+inside System. ADMIN-1c was completed under the clarification (Today
+already disclaims business state in its header and footer), but the
+locked IA was left unreconciled. ADMIN-1c's executor follow-up
+explicitly flagged this gap; this section closes it.
+
+**What changed in this doc.**
+
+| Section | Change |
+|---------|--------|
+| Header  | Status `LOCKED v1` → `LOCKED v1.1`; reconciliation history block added. |
+| §1      | Row 4 of the surface table re-scoped from *"Cross-cutting admin — customers, billing, infra, users, audit"* → *"Shared platform/ops — health, logs, infra, audit, admin users, control toggles, settings"*. New "Ownership rule" block inserted directly after the table. |
+| §2      | Sidebar IA listing: Customers + Billing marked TRANSITIONAL with relocation context; Users line clarified as admin/operator users only, not customer users. |
+| §3      | Audit-table rows for `/billing` and the four `customers/*` entries marked *(transitional, v1.1)* with relocation context. |
+| §5      | Re-titled "Implementation sequence — status"; all six tickets marked `done` with commit refs. |
+| Appendix | New ownership-rule invariant codifies the clarification; old "Per-vertical Revenue" line preserved as a corollary. |
+| §6      | This section, new. |
+
+**What did NOT change.**
+
+- §4 (stale pre-app-era pages list). The relocation question is
+  orthogonal; stale-page tracking still works the same way.
+- No source changes in this lane — pure doc reconciliation. The
+  transitional surfaces (`/system/customers`, `/system/billing`)
+  remain live exactly as they shipped; they just carry a "transitional"
+  flag in this contract until a future lane relocates them.
+- The locked sidebar group label "System" stays. The reconciliation
+  is about *what System owns*, not what it's called.
+
+**Follow-on lane needed (NOT auto-promoted).**
+
+A future ADMIN lane (call it `ADMIN-RELOC-1`) should relocate the
+transitional surfaces under their owning verticals:
+
+- `/system/customers/*` → split between `/grow/customers/*` (Grow
+  buyers) and the equivalent paths under Trade / Edge as those become
+  the dominant buyer sources. The existing `system/customers/Layout.tsx`
+  already has Grow/Edge/Trade tabs, so the data plane is ready.
+- `/system/billing` → split into per-vertical billing/revenue tabs
+  (most of the file's reads already match Trade · Revenue's data
+  contract). The "platform billing" reading of System › Billing (infra
+  costs etc.) can either be retired or rebuilt against a real platform-
+  cost backend.
+- Keep `/system/users` as is (admin users, not customer users — the
+  invariant covers this).
+- Keep `/system/audit-logs`, `/system/infrastructure`, `/system/control-centre`,
+  `/system/settings` as is — these are genuinely platform/ops.
+
+That lane is not promoted by this reconciliation. Operator selects
+when (or whether) to run it.

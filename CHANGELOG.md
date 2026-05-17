@@ -11,9 +11,131 @@ Body text (if present) shown as indented sub-bullets.
 
 ---
 
+## 2026-05-17
+
+- **22:15 UTC** — auto-sync: 2026-05-17 22:15 UTC (`9fa50f5`) — 1 file
+        M	docs/ADMIN_IA.md
+- **22:05 UTC** — refactor(ADMIN-1g): rename /trade/legacy → /trade/engine (`f01ca0f`) — 5 files
+    Final step of the locked ADMIN_IA six-ticket sequence. Per the IA
+    audit table: the path name "legacy" was misleading — the
+    TejasOnly-gated Overview at /trade/legacy renders the *current* Trade
+    engine internals, not a deprecated one. Rename to /trade/engine so
+    the URL matches what the surface actually is, and keep the old path
+    working as a redirect for any in-flight bookmarks.
+    Route + nav
+      src/App.tsx
+        New: /trade/engine → TejasOnly(TradeOverview).
+        /trade/legacy now <Navigate to="/trade/engine" replace />.
+- **21:58 UTC** — feat(ADMIN-1f): wire Audit Logs + Customers Leads to live admin_api (`136d346`) — 3 files
+    Per docs/ADMIN_IA.md §5 ADMIN-1f: replace the two pre-app-era stubs
+    (32-LOC AuditLogs, 13-LOC customers/Leads) with real implementations
+    backed by endpoints that already exist on admin_api. Read-only,
+    intra-repo.
+    System › Audit Logs
+      src/pages/system/AuditLogs.tsx
+        Was a 30-line EmptyState. Now: paginated table sourced from
+        GET /api/settings/audit (existing endpoint over the audit_log
+        table joined to admin_users for actor email). Columns: time,
+        actor, action, target type/id, details (truncated JSON with
+- **21:34 UTC** — feat(ADMIN-1e): split /edge vs /edge/betting + wire edge-api health (`b263a93`) — 9 files
+    Per docs/ADMIN_IA.md §5 ADMIN-1e: cleanly separate the platform-health
+    Overview from the betting accounts/positions surface and wire the
+    admin dashboard to glitch-edge-api for the read-only health endpoints
+    that exist today.
+    Routes
+      /edge          → EdgeOverview (platform health, env, deeper-surface link)
+      /edge/betting  → EdgeBetting  (accounts/strategies/EV signals — placeholder
+                                     until an admin /v1/admin/* layer lands on
+                                     edge-api)
+    Pages
+- **21:22 UTC** — feat(ADMIN-1d): Grow agent shells (Ads first; Social/UGC/SEO/Voice parity) (`f911703`) — 13 files
+    Per docs/ADMIN_IA.md §3/§5 and the 2026-05-17 ADMIN-1d ruling: bring
+    the Grow control-plane shape out of stub territory by giving each
+    agent the same Overview pattern Sales already had, and build the first
+    deployment sub-shell for the Ads agent (BSK-002 wedge — Shopify D2C
+    India) as the canonical per-agent entry structure. Read-only; no
+    backend work; no Grow product app changes.
+    Ads (full shell — active commercial wedge)
+      src/pages/grow/ads/Overview.tsx
+        Rewritten: wires growAgentsSummary, real metrics
+        (status / pending / outputs / deployments), description names the
+- **21:12 UTC** — fix(ADMIN-1c): drop System › Customers card from Today (`6ac6671`) — 1 file
+    The 2026-05-17 supervisor clarification on the admin-dashboard
+    ownership model places customer / billing / user state under the
+    owning vertical (Trade / Grow / Edge), not under System. The
+    "Customers" surface-entry card on Today therefore contradicted the
+    clarified taxonomy — promoting business-operational data as a System
+    surface in the operator's "where do I go next?" grid.
+    Replace it with a System self-card pointing at /system/control-centre
+    (global toggles, kill switches, infra board, audit log). Keeps the
+    4-card layout balanced and aligns the System self-reference with
+    shared platform/ops, which is what System is actually for.
+- **21:09 UTC** — feat(ADMIN-1c): rebuild / as System > Today (`3f5f00e`) — 6 files
+    Per docs/ADMIN_IA.md §1: the dashboard root is the System overview,
+    not a Trade page. The pre-app-era DashboardHome mixed Trade engine
+    KPIs (engine status, account equity, trades/signals today), customer
+    state (totals, tiers, MRR/ARR, email signups), and infra cost into
+    one landing card grid, which violated the IA's ownership-boundary
+    appendix.
+    Replaced with `src/pages/system/Today.tsx`:
+    - Alerts strip (cross-product, from existing /api/dashboard/alerts).
+    - Infra heartbeat — services up/down count (lists the failing ones
+      inline) + CPU/Memory/Disk progress bars (from existing
+- **20:55 UTC** — refactor(ADMIN-1b): rename admin/* -> system/* + retire dead pages (`817300f`) — 18 files
+    Structural cleanup per docs/ADMIN_IA.md §ADMIN-1b. No behaviour
+    change, no broad rewrite.
+    - Move pages/admin/* and root-level Billing/Infrastructure/Settings
+      into pages/system/ (10 file renames).
+    - Delete pages/Clients.tsx + pages/ClientDetail.tsx; the /clients
+      redirect already points at /system/customers.
+    - App.tsx: imports + routes renamed to /system/*; legacy redirects
+      added for /billing, /infrastructure, /settings, /admin/customers*,
+      /admin/control-centre, /admin/users, /admin/audit-logs so
+      bookmarks and external links keep working.
+- **20:47 UTC** — docs(ADMIN-1a): lock admin-dashboard IA + stale-page audit (`13ea4e0`) — 1 file
+    First locked artifact for the admin-dashboard rewrite. Defines the
+    top-level control-panel shape as four peer surfaces (Trade / Grow /
+    Edge / System), audits every current route as keep/rename/build-out/
+    retire, calls out the pre-app-era pages (Clients/ClientDetail/
+    DashboardHome/Billing/Infrastructure/Settings + the agent and edge
+    stubs), and sequences the next six tickets (ADMIN-1b…1g). No source
+    edits in this ticket — folder moves and rebuilds start in 1b.
+
 ## 2026-05-16
 
-- **22:00 UTC** — auto-sync: 2026-05-16 22:00 UTC (`2a39755`) — 3 files
+- **22:39 UTC** — feat(api): make API base configurable for CF Pages deployment (`cead3b3`) — 3 files
+    When the SPA moves to Cloudflare Pages, dashboard.glitchexecutor.com
+    serves the static bundle from CF's edge — admin_api still runs on the
+    host, so the SPA needs a separate hostname to reach it.
+    Adds VITE_API_BASE env override (defaults to
+    https://admin-api.glitchexecutor.com) used by both axios and the
+    WebSocket hook. JWT bearer auth is in a header not a cookie, so the
+    cross-origin XHR just works once admin_api's CORS allows the SPA
+    origin (already does — dashboard.glitchexecutor.com is whitelisted).
+    Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+- **22:25 UTC** — feat(trade-admin): wire Revenue/Users/Subscriptions to /api/trade-admin proxy (`d7e4762`) — 4 files
+    Adds src/api/tradeAdmin.ts with typed clients for the three admin_api proxy
+    endpoints (metrics / users / subscriptions). The proxy injects the
+    TRADE_ADMIN_API_SECRET header server-side so the SPA bundle stays secret-free.
+    Revenue: MRR, paid/free split, churn, trial conv + per-tier breakdown.
+    Users: paginated table with email search, tier + status badges, activity
+    counts (accounts, replays, last seen).
+    Subscriptions: status-filtered table with KPIs (active/past_due/cancel
+    pending/cancelled-30d) + Stripe-dashboard deep links per row.
+    All three use React Query with 60s polling and shared cache keys.
+    Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+- **22:04 UTC** — feat(admin): Trade · Business surface + gate legacy engine views to operator email (`745cbbc`) — 4 files
+    Per request, the admin dashboard now focuses on business operations
+    for trade.glitchexecutor.com. Two-part structure:
+    1. **Trade · Business** (open to all admins)
+       New section, three placeholder routes wired to sidebar:
+       - /trade/revenue        → MRR, active subs, churn, trial conversion
+       - /trade/users          → all signed-up users + sub state + activity
+       - /trade/subscriptions  → per-subscription row browser (status filters)
+       Each page renders the layout + headline KPI tiles ("—" placeholders)
+       + an EmptyState explaining what /v1/admin/* endpoint feeds it. The
+       trade-api side is the next ship; this commit lays the SPA route
+- **22:00 UTC** — auto-sync: 2026-05-16 22:00 UTC (`eb11140`) — 4 files
         M	src/App.tsx
         A	src/components/TejasOnly.tsx
         M	src/components/layout/AppSidebar.tsx
