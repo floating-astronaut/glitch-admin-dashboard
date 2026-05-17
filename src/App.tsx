@@ -94,10 +94,13 @@ export default function App() {
 
           {/* Trade · Engine (personal) — proprietary engine internals,
               locked to OPERATOR_EMAIL via <TejasOnly>. Sidebar hides
-              the links for everyone else. /trade/legacy is the new
-              path for the original Overview to free up /trade for
-              the business dashboard. */}
-          <Route path="trade/legacy"   element={<TejasOnly><TradeOverview /></TejasOnly>} />
+              the links for everyone else. /trade/engine is the
+              operator path for the engine cockpit (renamed from the
+              misleading "/trade/legacy" in ADMIN-1g — the surface is
+              the *current* engine, not a deprecated one). The old
+              /trade/legacy URL keeps working via the redirect below. */}
+          <Route path="trade/engine"   element={<TejasOnly><TradeOverview /></TejasOnly>} />
+          <Route path="trade/legacy"   element={<Navigate to="/trade/engine" replace />} />
           <Route path="trade/bots"     element={<TejasOnly><TradeBots /></TejasOnly>} />
           <Route path="trade/signals"  element={<TejasOnly><TradeSignals /></TejasOnly>} />
           <Route path="trade/trades"   element={<TejasOnly><TradeTrades /></TejasOnly>} />

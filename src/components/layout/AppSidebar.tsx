@@ -52,14 +52,16 @@ const NAV: NavGroup[] = [
     ],
   },
   {
-    // Engine-internals from the legacy dashboard era. Personal-use
-    // only — gated to OPERATOR_EMAIL since these surfaces expose the
+    // Engine-internals for the live Trade engine. Personal-use only
+    // — gated to OPERATOR_EMAIL since these surfaces expose the
     // proprietary Snake/Ouroboros ensemble's internals and aren't
-    // shared with future operators.
+    // shared with future operators. Renamed from "/trade/legacy" to
+    // "/trade/engine" in ADMIN-1g — the surface is the *current*
+    // engine, not a deprecated one.
     title: 'Trade · Engine (personal)',
     gateEmail: OPERATOR_EMAIL,
     items: [
-      { title: 'Overview',  url: '/trade/legacy', icon: LayoutDashboard, end: true },
+      { title: 'Overview',  url: '/trade/engine', icon: LayoutDashboard, end: true },
       { title: 'Bots',      url: '/trade/bots', icon: Bot },
       { title: 'Signals',   url: '/trade/signals', icon: Zap },
       { title: 'Trades',    url: '/trade/trades', icon: BarChart3 },

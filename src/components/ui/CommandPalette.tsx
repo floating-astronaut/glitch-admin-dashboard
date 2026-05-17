@@ -23,6 +23,7 @@ interface Cmd {
 
 const COMMANDS: Cmd[] = [
   { group: 'Trade', label: 'Trade · Overview', to: '/trade', icon: LayoutDashboard },
+  { group: 'Trade', label: 'Trade · Engine', to: '/trade/engine', icon: LayoutDashboard },
   { group: 'Trade', label: 'Trade · Bots', to: '/trade/bots', icon: Bot },
   { group: 'Trade', label: 'Trade · Signals', to: '/trade/signals', icon: Zap },
   { group: 'Trade', label: 'Trade · Trades', to: '/trade/trades', icon: BarChart3 },

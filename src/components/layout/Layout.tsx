@@ -13,6 +13,7 @@ import { Search } from 'lucide-react'
 const PAGE_TITLES: Record<string, string> = {
   '/':                'System · Today',
   '/trade':           'Trade · Overview',
+  '/trade/engine':    'Trade · Engine',
   '/trade/bots':      'Trade · Bots',
   '/trade/signals':   'Trade · Signals',
   '/trade/trades':    'Trade · Trades',
