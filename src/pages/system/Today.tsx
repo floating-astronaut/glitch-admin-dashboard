@@ -28,7 +28,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import {
   Activity, AlertCircle, ArrowRight, BarChart3, Bot, Cpu,
-  HardDrive, MemoryStick, RefreshCw, Server, ShoppingCart, Target,
+  HardDrive, MemoryStick, RefreshCw, Server, LayoutGrid, Target,
   type LucideIcon,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
@@ -281,12 +281,16 @@ export default function Today() {
             to="/edge"
             icon={Target}
           />
+          {/* System self-card points at a platform-ops surface, not at
+              business-operational data. Per the 2026-05-17 supervisor
+              clarification, customer/billing/user state belongs to the
+              owning vertical (Trade/Grow/Edge), not to System. */}
           <VerticalCard
             surface="System"
-            headline="Customers"
-            body="Cross-vertical buyers list. Lead aggregate, paid users, churn signal."
-            to="/system/customers"
-            icon={ShoppingCart}
+            headline="Control Centre"
+            body="Global toggles, kill switches, infra board, audit log."
+            to="/system/control-centre"
+            icon={LayoutGrid}
           />
         </div>
       </Section>
