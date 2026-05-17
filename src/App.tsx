@@ -20,49 +20,22 @@ import CustomersLayout from './pages/grow/customers/Layout'
 import CustomersBuyers from './pages/grow/customers/Buyers'
 import CustomersLeads  from './pages/grow/customers/Leads'
 import BuyerDetail     from './pages/grow/customers/BuyerDetail'
-import TradeBilling    from './pages/trade/Billing'
 
-// Trade vertical
-//   * Trade · Business — Revenue / Users / Subscriptions. Read from
-//     trade-api /v1/admin/* (next ship). Shown to all admins.
-//   * Trade · Engine (personal) — legacy Bots / Signals / Trades / Oracle
-//     / News. Proprietary engine internals; gated to OPERATOR_EMAIL via
-//     <TejasOnly>. Sidebar also hides the links for non-Tejas users.
-import { TejasOnly } from './components/TejasOnly'
-import TradeOverview from './pages/trade/Overview'
-import TradeBots from './pages/trade/Bots'
-import TradeSignals from './pages/trade/Signals'
-import TradeTrades from './pages/trade/Trades'
-import TradeOracle from './pages/trade/Oracle'
-import TradeNews from './pages/trade/News'
-// Trade · Business pages (placeholders until /v1/admin/* lands)
-import TradeRevenue from './pages/trade/Revenue'
-import TradeUsers from './pages/trade/Users'
+// Trade vertical — Trade · Business only (Revenue / Users /
+// Subscriptions / Billing). Engine internals (Bots / Signals / Trades
+// / Oracle / News / engine cockpit) are NOT part of the admin
+// dashboard per the v1.4 IA — they live elsewhere.
+import TradeRevenue       from './pages/trade/Revenue'
+import TradeUsers         from './pages/trade/Users'
 import TradeSubscriptions from './pages/trade/Subscriptions'
+import TradeBilling       from './pages/trade/Billing'
 
-// Grow vertical
+// Grow vertical — business-operator surfaces only (Overview / Customers
+// / Users / Billing). Per-agent shells (Sales / Ads / Social / UGC /
+// SEO / Voice) are NOT part of the admin dashboard per the v1.4 IA.
 import GrowOverview from './pages/grow/Overview'
-import GrowUsers   from './pages/grow/Users'
-import GrowBilling from './pages/grow/Billing'
-import SalesAgentOverview from './pages/grow/sales/Overview'
-import AdsAgentOverview from './pages/grow/ads/Overview'
-import SocialAgentOverview from './pages/grow/social/Overview'
-import UgcAgentOverview from './pages/grow/ugc/Overview'
-import SeoAgentOverview from './pages/grow/seo/Overview'
-import VoiceAgentOverview from './pages/grow/voice/Overview'
-import BudzLayout   from './pages/grow/sales/budz/Layout'
-import BudzOverview from './pages/grow/sales/budz/Overview'
-import BudzLeads    from './pages/grow/sales/budz/Leads'
-import BudzDrafts   from './pages/grow/sales/budz/Drafts'
-import BudzSends    from './pages/grow/sales/budz/Sends'
-// Ads · BSK-002 deployment shell (active Phase-1 commercial wedge:
-// Shopify D2C India). Preview surface — customer-level data lands
-// once the ads-agent operator API ships.
-import AdsBsk002Layout    from './pages/grow/ads/bsk002/Layout'
-import AdsBsk002Overview  from './pages/grow/ads/bsk002/Overview'
-import AdsBsk002Campaigns from './pages/grow/ads/bsk002/Campaigns'
-import AdsBsk002Creatives from './pages/grow/ads/bsk002/Creatives'
-import AdsBsk002Reports   from './pages/grow/ads/bsk002/Reports'
+import GrowUsers    from './pages/grow/Users'
+import GrowBilling  from './pages/grow/Billing'
 
 // Edge vertical — split into Overview (platform health, /edge) and
 // Betting (accounts/positions/signals, /edge/betting) per ADMIN-1e.
@@ -101,59 +74,15 @@ export default function App() {
           <Route path="trade/subscriptions"  element={<TradeSubscriptions />} />
           <Route path="trade/billing"        element={<TradeBilling />} />
 
-          {/* Trade · Engine (personal) — proprietary engine internals,
-              locked to OPERATOR_EMAIL via <TejasOnly>. Sidebar hides
-              the links for everyone else. /trade/engine is the
-              operator path for the engine cockpit (renamed from the
-              misleading "/trade/legacy" in ADMIN-1g — the surface is
-              the *current* engine, not a deprecated one). The old
-              /trade/legacy URL keeps working via the redirect below. */}
-          <Route path="trade/engine"   element={<TejasOnly><TradeOverview /></TejasOnly>} />
-          <Route path="trade/legacy"   element={<Navigate to="/trade/engine" replace />} />
-          <Route path="trade/bots"     element={<TejasOnly><TradeBots /></TejasOnly>} />
-          <Route path="trade/signals"  element={<TejasOnly><TradeSignals /></TejasOnly>} />
-          <Route path="trade/trades"   element={<TejasOnly><TradeTrades /></TejasOnly>} />
-          <Route path="trade/oracle"   element={<TejasOnly><TradeOracle /></TejasOnly>} />
-          <Route path="trade/news"     element={<TejasOnly><TradeNews /></TejasOnly>} />
-
-          {/* Grow vertical */}
-          <Route path="grow"               element={<GrowOverview />} />
-          <Route path="grow/sales"         element={<SalesAgentOverview />} />
-          <Route path="grow/sales/budz" element={<BudzLayout />}>
-            <Route index           element={<BudzOverview />} />
-            <Route path="leads"    element={<BudzLeads />} />
-            <Route path="drafts"   element={<BudzDrafts />} />
-            <Route path="sends"    element={<BudzSends />} />
-          </Route>
-          <Route path="grow/ads"           element={<AdsAgentOverview />} />
-          <Route path="grow/ads/bsk002" element={<AdsBsk002Layout />}>
-            <Route index             element={<AdsBsk002Overview />} />
-            <Route path="campaigns"  element={<AdsBsk002Campaigns />} />
-            <Route path="creatives"  element={<AdsBsk002Creatives />} />
-            <Route path="reports"    element={<AdsBsk002Reports />} />
-          </Route>
-          <Route path="grow/social"        element={<SocialAgentOverview />} />
-          <Route path="grow/ugc"           element={<UgcAgentOverview />} />
-          <Route path="grow/seo"           element={<SeoAgentOverview />} />
-          <Route path="grow/voice"         element={<VoiceAgentOverview />} />
-
-          {/* Grow · Customers — relocated from /system/customers in
-              ADMIN-RELOC-1 per the v1.1 ownership rule. /system/customers
-              redirects below for legacy nav. */}
+          {/* Grow vertical — business-operator surfaces only per v1.4 IA. */}
+          <Route path="grow"            element={<GrowOverview />} />
           <Route path="grow/customers" element={<CustomersLayout />}>
             <Route index                    element={<CustomersBuyers />} />
             <Route path="leads"             element={<CustomersLeads />} />
             <Route path="buyers/:paymentId" element={<BuyerDetail />} />
           </Route>
-          {/* Grow · Users + Billing — SHELLS-1 preview surfaces. */}
           <Route path="grow/users"   element={<GrowUsers />} />
           <Route path="grow/billing" element={<GrowBilling />} />
-
-          {/* Legacy /grow/budz/* → /grow/sales/budz/* */}
-          <Route path="grow/budz"         element={<Navigate to="/grow/sales/budz" replace />} />
-          <Route path="grow/budz/leads"   element={<Navigate to="/grow/sales/budz/leads" replace />} />
-          <Route path="grow/budz/drafts"  element={<Navigate to="/grow/sales/budz/drafts" replace />} />
-          <Route path="grow/budz/sends"   element={<Navigate to="/grow/sales/budz/sends" replace />} />
 
           {/* Edge vertical — /edge is the platform overview, /edge/betting
               is the betting accounts / positions / signals surface.

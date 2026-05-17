@@ -1,6 +1,6 @@
 # ADMIN_IA — Glitch Admin Dashboard Information Architecture
 
-Status: **LOCKED v1.3** (2026-05-17 — SHELLS-1 shipped)
+Status: **LOCKED v1.4** (2026-05-17 — TRIM-1: scope locked to business-operator surfaces; single-user model)
 Owner: Tejas
 Scope: ADMIN-1a — define the control-panel shape, audit current pages, and
 sequence the rewrite. No source edits in this ticket.
@@ -22,6 +22,17 @@ History:
   now hold space in the IA, modeled on the Ads BSK-002 preview
   pattern. Each shell is an EmptyState that names the upstream
   blocker (operator API on the respective app).
+- v1.4 (2026-05-17) — `ADMIN-TRIM-1` locked the admin dashboard's
+  scope to **business-operator surfaces only** and the **single-user
+  model**. Operator final sidebar spec:
+  Trade · Business / Grow / Edge / System (4 peer groups). Trade ·
+  Engine internals (Bots / Signals / Trades / Oracle / News / engine
+  cockpit) and the Grow per-agent shells (Sales / Ads / Social / UGC
+  / SEO / Voice) were **removed entirely** — they live elsewhere,
+  not in the admin console. The dashboard binds to
+  `admin@glitchexecutor.com` as the sole user (SSO-side enforcement);
+  the previous `OPERATOR_EMAIL` / `gateEmail` / `<TejasOnly>`
+  machinery was dropped as dead ceremony.
 
 This file is the contract the rest of the admin-dashboard rewrite is built
 against. Subsequent ADMIN tickets (1b, 1c, …) must either conform to this
@@ -36,10 +47,24 @@ They are peers — not nested, not collapsible into one "agents" group.
 
 | # | Surface | Purpose                                              | Audience            |
 |---|---------|------------------------------------------------------|---------------------|
-| 1 | Trade   | Glitch Trade SaaS — revenue / customers / engine     | All admins + operator (engine) |
-| 2 | Grow    | Glitch Grow agent suite — Sales / Ads / Social / UGC / SEO / Voice | All admins per brand |
-| 3 | Edge    | Glitch Edge betting platform — accounts / signals    | All admins          |
-| 4 | System  | Shared platform/ops — health, logs, infra, audit, admin users, control toggles, settings | All admins          |
+| 1 | Trade · Business | Glitch Trade SaaS operator console — revenue / customer-users / subscriptions / billing | sole admin |
+| 2 | Grow             | Glitch Grow operator console — paid buyers, Grow customer-users, Grow billing | sole admin |
+| 3 | Edge             | Glitch Edge operator console — platform health, betting accounts, Edge customer-users, Edge billing | sole admin |
+| 4 | System           | Shared platform/ops — Today, infrastructure, control centre, admin/operator users, audit logs, settings | sole admin |
+
+**Single-user model (v1.4).** The dashboard binds to
+`admin@glitchexecutor.com` as the sole user. Multi-user audience
+distinctions in earlier versions of this table (gated engine
+surfaces, per-brand operator scoping) are no longer relevant; the
+"Audience" column reads *sole admin* across the board. SSO-side
+enforcement that only that one account can authenticate is upstream
+in `glitchexecutor-sso.service`.
+
+**Scope rule (v1.4).** The admin dashboard carries
+**business-operator surfaces only**. Trade engine internals (Bots /
+Signals / Trades / Oracle / News) and the per-agent Grow shells
+(Sales / Ads / Social / UGC / SEO / Voice) are NOT part of the admin
+dashboard — they live in the Trade and Grow apps themselves.
 
 **Ownership rule** (codified 2026-05-17, v1.1 reconciliation):
 business-operational data — customer accounts, customer billing,
@@ -253,6 +278,123 @@ These hold across every ticket above:
 
 This section records every change to this IA after its initial lock.
 Entries are in reverse-chronological order.
+
+### 2026-05-17 — v1.4 TRIM-1 (scope locked to business-operator surfaces; single-user model)
+
+**Trigger.** Operator locked the final sidebar:
+
+```
+Trade · Business   Revenue / Users / Subscriptions / Billing
+Grow               Overview / Customers / Users / Billing
+Edge               Overview / Betting / Users / Billing
+System             Today / Infrastructure / Control Centre /
+                   User Management / Audit Logs / Settings
+```
+
+And confirmed the single-user binding: *"for dashboard there will
+never be any user, bind it to admin@glitchexecutor.com"*. The
+combination collapses two things at once:
+
+1. **Trade · Engine internals** (Bots / Signals / Trades / Oracle /
+   News / engine cockpit) and the **6 Grow agent shells** (Sales /
+   Ads / Social / UGC / SEO / Voice) are **not part of the admin
+   dashboard**. They live elsewhere (the Trade and Grow apps
+   themselves).
+2. The dashboard binds to **admin@glitchexecutor.com** as the sole
+   user. Every email-based gate (`OPERATOR_EMAIL`, `gateEmail`,
+   `<TejasOnly>`) becomes dead ceremony.
+
+**What was deleted.**
+
+*Files (24 deletions)*
+
+| Group | Files |
+|-------|-------|
+| Trade · Engine | `src/pages/trade/{Overview,Bots,Signals,Trades,Oracle,News}.tsx` |
+| Grow · Sales agent | `src/pages/grow/sales/Overview.tsx` + `src/pages/grow/sales/budz/{Layout,Overview,Leads,Drafts,Sends}.tsx` |
+| Grow · Ads agent | `src/pages/grow/ads/Overview.tsx` + `src/pages/grow/ads/bsk002/{Layout,Overview,Campaigns,Creatives,Reports}.tsx` |
+| Grow · Other agents | `src/pages/grow/{social,ugc,seo,voice}/Overview.tsx` |
+| Grow agent shell components | `src/components/grow/{AgentShell,AgentOverviewBody}.tsx` |
+| Dead gating | `src/components/TejasOnly.tsx` |
+
+Plus the corresponding subdirectories (`pages/trade/*` keeps only its
+Business pages; `pages/grow/sales`, `pages/grow/ads`, `pages/grow/social`,
+`pages/grow/seo`, `pages/grow/ugc`, `pages/grow/voice` directories all gone).
+
+*Routes (App.tsx)*
+
+Removed: `/trade/engine`, `/trade/legacy`, `/trade/bots`,
+`/trade/signals`, `/trade/trades`, `/trade/oracle`, `/trade/news`,
+`/grow/sales`, `/grow/sales/budz/*` (5 routes), `/grow/ads`,
+`/grow/ads/bsk002/*` (5 routes), `/grow/social`, `/grow/ugc`,
+`/grow/seo`, `/grow/voice`, plus the `/grow/budz/*` legacy
+redirects (target was deleted).
+
+*Sidebar (AppSidebar.tsx)*
+
+- Removed the entire `Trade · Engine (personal)` group.
+- Trimmed Grow group from 10 items to 4: Overview / Customers /
+  Users / Billing.
+- Removed `OPERATOR_EMAIL` constant, `gateEmail` field, and
+  `FilteredNavGroups` filter function — single-user model means no
+  gating is needed.
+
+*Chrome*
+
+- `Layout.tsx` PAGE_TITLES: removed all `/trade/engine`,
+  `/trade/bots`, `/trade/signals`, `/trade/trades`, `/trade/oracle`,
+  `/trade/news` and all `/grow/sales*`, `/grow/ads*`, `/grow/social`,
+  `/grow/ugc`, `/grow/seo`, `/grow/voice` entries. Added the four
+  missing `/trade/*` Business entries (Revenue / Users / Subscriptions)
+  alongside the existing Billing.
+- `CommandPalette.tsx`: rebuilt from 33 commands → 20. Every
+  surface in the new sidebar has a palette entry; no commands point
+  at deleted routes.
+- `Today.tsx`: Grow surface-card body updated from *"Per-brand AI
+  agents — Sales, Ads, Social, UGC, SEO, Voice"* → *"Paid buyers,
+  customer-user database, and Grow-side billing"*.
+- `src/pages/grow/Overview.tsx`: rebuilt. Was the agent grid driven
+  by `growAgentsSummary`; now a slim landing showing the three deep
+  Grow surfaces (Customers / Users / Billing) as cards. No more
+  agent content.
+
+*API client (`src/api/grow.ts`)*
+
+- Removed: `BudzStats`, `Lead`, `EmailDraft`, `EmailSend`,
+  `FunnelRow`, `GrowAgentId`, `GrowAgentStatus`, `GrowAgentSummary`
+  types; `budzStats`, `budzLeads`, `budzDrafts`, `budzSends`,
+  `budzFunnel`, `growAgentsSummary` functions.
+- Kept: the Customer-management types and functions (Buyer,
+  BuyerDetail, customers*) — those back the surviving Grow surfaces.
+
+**Single-user model — what the dashboard side carries.**
+
+- No hard-coded operator email anywhere in the codebase.
+- `AuthGuard` still gates every route on `token` presence — the
+  token must come from SSO at `glitchexecutor-sso.service`.
+- The `user.email` displayed in the sidebar footer is whatever SSO
+  returns. Effective enforcement that *only* `admin@glitchexecutor.com`
+  can authenticate is **SSO-side** (cross-repo; out of this lane's
+  scope). When that enforcement lands, no dashboard change is needed.
+
+**Verification** (skill `superpowers:verification-before-completion`)
+- `vite build` clean (`✓ built in 11.16s`).
+- Bundle dropped from 300.25 → 287.67 kB gzip (**−12.58 kB**) thanks
+  to the deletions. Modules transformed: 2954 → 2932.
+- Grep audit confirms no remaining references to the deleted
+  surfaces (no imports, no Route definitions, no PAGE_TITLES
+  entries, no palette commands).
+- Per the verification-policy memory, this is a deletion + sidebar
+  lane with no public writes, no auth edge cases, no OAuth, no
+  state-change risk; closes on clean build + audit.
+
+**Out of scope (held).**
+- SSO-side enforcement of `admin@glitchexecutor.com` as the sole
+  account (cross-repo — lives in `glitchexecutor-sso.service`).
+- Trade · Business surface implementations (`/trade/revenue`,
+  `/trade/users`, `/trade/subscriptions`) are still placeholders
+  awaiting `/v1/admin/*` on trade-api; `/trade/billing` is live
+  today against admin_api. None of those changed in this lane.
 
 ### 2026-05-17 — v1.3 SHELLS-1 shipped (per-vertical user + billing preview shells)
 

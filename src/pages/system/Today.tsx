@@ -268,8 +268,8 @@ export default function Today() {
           />
           <VerticalCard
             surface="Grow"
-            headline="Grow · Overview"
-            body="Per-brand AI agents — Sales, Ads, Social, UGC, SEO, Voice."
+            headline="Grow · Business"
+            body="Paid buyers, customer-user database, and Grow-side billing."
             to="/grow"
             icon={Bot}
           />

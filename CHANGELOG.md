@@ -13,7 +13,36 @@ Body text (if present) shown as indented sub-bullets.
 
 ## 2026-05-17
 
-- **22:15 UTC** — auto-sync: 2026-05-17 22:15 UTC (`9fa50f5`) — 1 file
+- **23:15 UTC** — auto-sync: 2026-05-17 23:15 UTC (`0702e6f`) — 33 files
+        M	docs/ADMIN_IA.md
+        M	src/App.tsx
+        M	src/api/grow.ts
+        D	src/components/TejasOnly.tsx
+        D	src/components/grow/AgentOverviewBody.tsx
+        ... (+28 more)
+- **22:35 UTC** — feat(ADMIN-SHELLS-1): preview shells for /grow/users /grow/billing /edge/users /edge/billing (`8f263d8`) — 9 files
+    Realizes the four deferred placeholder surfaces from RELOC-1 v1.2,
+    per the operator clarification that Grow and Edge each have their own
+    app + database for users. Each shell is the Ads-BSK-002 preview
+    pattern: header card + EmptyState that names the upstream blocker.
+    Files
+      src/pages/grow/Users.tsx       /grow/users
+      src/pages/grow/Billing.tsx     /grow/billing
+      src/pages/edge/Users.tsx       /edge/users
+      src/pages/edge/Billing.tsx     /edge/billing
+    Each shell makes the operator/admin distinction explicit: Grow · Users
+- **22:26 UTC** — refactor(ADMIN-RELOC-1): move Customers under Grow, Billing under Trade (`7c69927`) — 11 files
+    Per the operator confirmation of the v1.1 ownership rule
+    ("admin dashboard should be divided between trade grow edge where
+    under them they will be having there own database like user, billing
+    and all and then there will be a system section where all info
+    related to our server like health logs and all"), physically move
+    the two transitional surfaces from System to their owning verticals.
+    Investigation of `Billing.tsx` confirmed the data is pure Trade-SaaS
+    subscriber billing (admin_api `/api/billing/*` reads from
+    `customers` table with starter/pro/elite tiers at $49/$149/$349 —
+    MRR / ARR / plan counts / email signups). Trade is the right home.
+- **22:15 UTC** — auto-sync: 2026-05-17 22:15 UTC (`f25a27a`) — 2 files
         M	docs/ADMIN_IA.md
 - **22:05 UTC** — refactor(ADMIN-1g): rename /trade/legacy → /trade/engine (`f01ca0f`) — 5 files
     Final step of the locked ADMIN_IA six-ticket sequence. Per the IA

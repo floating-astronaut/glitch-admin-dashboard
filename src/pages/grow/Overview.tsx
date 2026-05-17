@@ -1,104 +1,92 @@
-import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+/**
+ * Grow › Overview — business-operator landing for the Grow vertical.
+ *
+ * v1.4 IA: Grow in the admin dashboard carries Overview / Customers /
+ * Users / Billing only. Per-agent operations live elsewhere (out of
+ * the admin dashboard). This page is the surface-grid into Grow's
+ * three deep operator surfaces.
+ */
+import { Link } from 'react-router-dom'
 import {
-  Sprout, MessageSquare, Megaphone, Share2, Film, Search, PhoneCall, ArrowRight,
+  ArrowRight, CreditCard, ShoppingCart, Sprout, Users,
+  type LucideIcon,
 } from 'lucide-react'
+import Card from '../../components/ui/Surface'
 import Section from '../../components/ui/Section'
-import StatusBadge from '../../components/ui/StatusBadge'
-import { growAgentsSummary, type GrowAgentId, type GrowAgentSummary } from '../../api/grow'
 
-const AGENT_META: Record<GrowAgentId, { icon: any; tagline: string; href: string }> = {
-  sales: {
-    icon: MessageSquare,
-    tagline: 'Outbound B2B sequences · HITL drafts',
-    href: '/grow/sales',
-  },
-  ads: {
-    icon: Megaphone,
-    tagline: 'Meta / Google / TikTok paid acquisition',
-    href: '/grow/ads',
-  },
-  social: {
-    icon: Share2,
-    tagline: 'LinkedIn / X / IG / TikTok cadence',
-    href: '/grow/social',
-  },
-  ugc: {
-    icon: Film,
-    tagline: 'AI-generated short-form video',
-    href: '/grow/ugc',
-  },
-  seo: {
-    icon: Search,
-    tagline: 'Keywords · programmatic · AEO/LLMO',
-    href: '/grow/seo',
-  },
-  voice: {
-    icon: PhoneCall,
-    tagline: 'Outbound calls · COD confirmations',
-    href: '/grow/voice',
-  },
+function SurfaceCard({
+  headline, body, to, icon: Icon,
+}: {
+  headline: string
+  body: string
+  to: string
+  icon: LucideIcon
+}) {
+  return (
+    <Link
+      to={to}
+      className="group flex items-start justify-between gap-3 rounded-xl border border-g-border bg-g-card p-4 transition-all hover:border-accent/30 hover:bg-accent/5"
+    >
+      <div className="min-w-0">
+        <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-g-dim">
+          <Icon size={12} className="text-g-muted group-hover:text-accent" />
+          Grow
+        </div>
+        <div className="mt-1 text-sm font-semibold text-white">{headline}</div>
+        <p className="mt-1 text-xs text-g-muted">{body}</p>
+      </div>
+      <ArrowRight size={14} className="text-g-dim shrink-0 mt-1 group-hover:text-accent" />
+    </Link>
+  )
 }
 
 export default function GrowOverview() {
-  const navigate = useNavigate()
-  const { data, isLoading } = useQuery({
-    queryKey: ['grow:agents:summary'],
-    queryFn: growAgentsSummary,
-    refetchInterval: 30_000,
-  })
-
-  const agents: GrowAgentSummary[] = data?.agents ?? []
-
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-          <Sprout size={14} className="text-accent" /> Grow — Marketing Control Plane
-        </h2>
-        <p className="text-xs text-g-muted mt-1">
-          Six specialised agents handle outbound, paid, organic, and conversational
-          marketing across all businesses. Each agent runs one or more deployments.
-        </p>
+      <div className="flex items-start gap-3">
+        <div className="p-2 rounded-lg bg-accent/10 text-accent">
+          <Sprout size={18} />
+        </div>
+        <div>
+          <h1 className="text-base font-semibold text-white">Grow — Business</h1>
+          <p className="text-xs text-g-muted mt-0.5">
+            Operator console for the Grow vertical: paid buyers,
+            customer-user database, and Grow-side billing.
+          </p>
+        </div>
       </div>
 
-      <Section title="Agents">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {(isLoading ? Object.keys(AGENT_META) as GrowAgentId[] : agents.map(a => a.id)).map(id => {
-            const meta = AGENT_META[id]
-            const a = agents.find(x => x.id === id)
-            const Icon = meta?.icon ?? Sprout
-            return (
-              <button
-                key={id}
-                onClick={() => meta && navigate(meta.href)}
-                className="text-left rounded-xl border bg-g-card p-4 group transition-all border-g-border hover:border-accent/40 hover:bg-accent/5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent/5"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="p-2 rounded-lg bg-accent/10 text-accent">
-                    <Icon size={18} />
-                  </div>
-                  <ArrowRight size={14} className="text-g-dim group-hover:text-accent" />
-                </div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-sm font-bold text-white">{a?.name ?? id}</h3>
-                  {a && <StatusBadge value={a.status} dot />}
-                </div>
-                <p className="text-xs text-g-muted">{meta?.tagline}</p>
-                <div className="mt-3 flex items-center gap-3 text-[10px] text-g-dim font-mono">
-                  <span>{a?.deployments ?? 0} deployment{(a?.deployments ?? 0) === 1 ? '' : 's'}</span>
-                  {a && a.pending_approvals > 0 && (
-                    <span className="text-yellow-300">· {a.pending_approvals} pending</span>
-                  )}
-                  {a && a.outputs_7d > 0 && (
-                    <span>· {a.outputs_7d}/7d</span>
-                  )}
-                </div>
-              </button>
-            )
-          })}
+      <Section title="Surfaces">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <SurfaceCard
+            headline="Customers"
+            body="Paid buyers + Vibe Kit lead aggregate."
+            to="/grow/customers"
+            icon={ShoppingCart}
+          />
+          <SurfaceCard
+            headline="Users"
+            body="Operator view of Grow's customer-user database."
+            to="/grow/users"
+            icon={Users}
+          />
+          <SurfaceCard
+            headline="Billing"
+            body="Per-brand plans, agent usage, invoices."
+            to="/grow/billing"
+            icon={CreditCard}
+          />
         </div>
       </Section>
+
+      <Card>
+        <p className="text-[11px] text-g-muted leading-relaxed">
+          Per-agent operations (Sales / Ads / Social / UGC / SEO /
+          Voice) live in the Grow app itself, not in the admin
+          dashboard. The admin console covers business-operator
+          surfaces only.
+        </p>
+      </Card>
     </div>
   )
 }
