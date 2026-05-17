@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from './stores/auth'
 import Layout from './components/layout/Layout'
 import Login from './pages/Login'
@@ -47,7 +47,11 @@ import EdgeBilling  from './pages/edge/Billing'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
-  if (!token) return <Navigate to="/login" replace />
+  const location = useLocation()
+  if (!token) {
+    // Preserve the deep link so Login can restore it post-sign-in.
+    return <Navigate to="/login" replace state={{ from: location }} />
+  }
   return <>{children}</>
 }
 

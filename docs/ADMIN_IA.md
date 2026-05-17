@@ -279,6 +279,49 @@ These hold across every ticket above:
 This section records every change to this IA after its initial lock.
 Entries are in reverse-chronological order.
 
+### 2026-05-17 — ADMIN-AUTH-1 (single-user login polish)
+
+Small cosmetic + UX lane after TRIM-1, completing the dashboard-side
+of the single-user binding (the SSO-side enforcement is still
+cross-repo, in `admin_api`'s `admin_users` table seed and the
+`ADMIN_EMAIL` env).
+
+**Changes.**
+
+- `src/pages/Login.tsx`: email field defaults to
+  `admin@glitchexecutor.com`; password input is auto-focused on
+  mount (since email is pre-filled); a yellow "Session expired"
+  banner surfaces when the user lands here from `AuthGuard`'s
+  redirect, naming the deep link they were trying to reach.
+  Subtitle clarifies that this is a single-user console. Native
+  `autocomplete="username"` / `autocomplete="current-password"`
+  added so password managers behave correctly.
+
+- `src/App.tsx` `AuthGuard`: when the token is missing, the
+  `<Navigate>` now passes `state={{ from: location }}`. Login uses
+  that state to restore the deep link on successful sign-in via
+  `navigate(from, { replace: true })`. Hitting `/grow/customers`
+  while signed out now ends at `/grow/customers` after sign-in
+  instead of dumping the user on `/`.
+
+**What did NOT change.**
+- No backend / schema work. Auth contract on `admin_api`
+  (`/auth/login` returns `{access_token, user}`) is unchanged.
+- No dashboard-side email allowlist enforcement. The admin_api's
+  `admin_users` table + `ADMIN_EMAIL` env is the source of truth
+  for who can authenticate; layering a client-side allowlist would
+  be dead ceremony (single-user model).
+- No SSO-redirect flow. The dashboard still uses direct
+  email/password auth against admin_api.
+
+**Verification** (skill `superpowers:verification-before-completion`)
+- `vite build` clean (`✓ built in 11.72s`). Bundle ≈ unchanged
+  (287.95 vs 287.67 kB gzip — the +0.28 kB is the session-expired
+  banner + a few extra labels).
+- Per the verification-policy memory, login UX polish with no
+  contract changes, no public writes, and no state-change risk
+  closes on clean build.
+
 ### 2026-05-17 — v1.4 TRIM-1 (scope locked to business-operator surfaces; single-user model)
 
 **Trigger.** Operator locked the final sidebar:
