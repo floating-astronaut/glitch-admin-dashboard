@@ -3,10 +3,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getAdminUsers, createAdminUser, updateAdminUser,
   getAuditLog, getEnvStatus
-} from '../api/endpoints'
-import DataTable, { Column } from '../components/ui/DataTable'
-import Modal from '../components/ui/Modal'
-import { TableToolbar, Pagination } from '../components/ui/TableToolbar'
+} from '../../api/endpoints'
+import DataTable, { Column } from '../../components/ui/DataTable'
+import Modal from '../../components/ui/Modal'
+import { TableToolbar, Pagination } from '../../components/ui/TableToolbar'
 import { UserPlus, Check, X, ShieldCheck } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import clsx from 'clsx'

@@ -30,15 +30,14 @@ const PAGE_TITLES: Record<string, string> = {
   '/grow/seo':                      'Grow · SEO Agent',
   '/grow/voice':                    'Grow · Voice / COD Agent',
   '/edge':            'Edge · Betting',
-  '/clients':         'Customers',
-  '/admin/customers':       'Admin · Customers',
-  '/admin/customers/leads': 'Admin · Customers · Leads',
-  '/billing':         'Billing',
-  '/infrastructure':  'Infrastructure',
-  '/settings':        'Settings',
-  '/admin/control-centre': 'Admin · Control Centre',
-  '/admin/users':          'Admin · User Management',
-  '/admin/audit-logs':     'Admin · Audit Logs',
+  '/system/customers':       'System · Customers',
+  '/system/customers/leads': 'System · Customers · Leads',
+  '/system/billing':         'System · Billing',
+  '/system/infrastructure':  'System · Infrastructure',
+  '/system/settings':        'System · Settings',
+  '/system/control-centre':  'System · Control Centre',
+  '/system/users':           'System · User Management',
+  '/system/audit-logs':      'System · Audit Logs',
 }
 
 export default function Layout() {

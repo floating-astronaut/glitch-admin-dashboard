@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { getBillingSummary, getPlans, getEmailSignups } from '../api/endpoints'
-import KpiCard from '../components/ui/KpiCard'
-import DataTable, { Column } from '../components/ui/DataTable'
-import { TableToolbar, Pagination } from '../components/ui/TableToolbar'
+import { getBillingSummary, getPlans, getEmailSignups } from '../../api/endpoints'
+import KpiCard from '../../components/ui/KpiCard'
+import DataTable, { Column } from '../../components/ui/DataTable'
+import { TableToolbar, Pagination } from '../../components/ui/TableToolbar'
 import { DollarSign, Users, Mail, TrendingUp } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 

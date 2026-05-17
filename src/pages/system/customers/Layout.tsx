@@ -3,17 +3,17 @@ import { Users } from 'lucide-react'
 import clsx from 'clsx'
 
 const VERTICALS = [
-  { id: 'grow',  label: 'Grow',  to: '/admin/customers',         enabled: true },
-  { id: 'edge',  label: 'Edge',  to: '/admin/customers/edge',    enabled: false },
-  { id: 'trade', label: 'Trade', to: '/admin/customers/trade',   enabled: false },
+  { id: 'grow',  label: 'Grow',  to: '/system/customers',         enabled: true },
+  { id: 'edge',  label: 'Edge',  to: '/system/customers/edge',    enabled: false },
+  { id: 'trade', label: 'Trade', to: '/system/customers/trade',   enabled: false },
 ] as const
 
 export default function CustomersLayout() {
   const { pathname } = useLocation()
 
   // Sub-tabs (Buyers / Leads) only render on the Grow vertical.
-  const onGrow = !pathname.startsWith('/admin/customers/edge') &&
-                 !pathname.startsWith('/admin/customers/trade')
+  const onGrow = !pathname.startsWith('/system/customers/edge') &&
+                 !pathname.startsWith('/system/customers/trade')
 
   return (
     <div className="space-y-4">
@@ -61,7 +61,7 @@ export default function CustomersLayout() {
       {onGrow && (
         <div className="flex items-center gap-1 text-xs">
           <NavLink
-            to="/admin/customers"
+            to="/system/customers"
             end
             className={({ isActive }) => clsx(
               'px-2.5 py-1 rounded-md transition-colors',
@@ -71,7 +71,7 @@ export default function CustomersLayout() {
             Buyers
           </NavLink>
           <NavLink
-            to="/admin/customers/leads"
+            to="/system/customers/leads"
             className={({ isActive }) => clsx(
               'px-2.5 py-1 rounded-md transition-colors',
               isActive ? 'bg-accent/10 text-accent' : 'text-g-muted hover:text-g-text'

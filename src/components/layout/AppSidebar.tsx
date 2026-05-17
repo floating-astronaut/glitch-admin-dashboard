@@ -86,16 +86,19 @@ const NAV: NavGroup[] = [
     ],
   },
   {
-    title: 'Admin',
+    // Renamed from "Admin" per ADMIN_IA §1: System is a peer of Trade /
+    // Grow / Edge, not a meta-layer above them. URLs follow the same
+    // /system/* namespace.
+    title: 'System',
     items: [
       { title: 'Home',            url: '/', icon: LayoutDashboard, end: true },
-      { title: 'Customers',       url: '/admin/customers', icon: Users },
-      { title: 'Billing',         url: '/billing', icon: CreditCard },
-      { title: 'Infrastructure',  url: '/infrastructure', icon: Server },
-      { title: 'Control Centre',  url: '/admin/control-centre', icon: LayoutGrid },
-      { title: 'User Management', url: '/admin/users', icon: ShieldCheck },
-      { title: 'Audit Logs',      url: '/admin/audit-logs', icon: FileClock },
-      { title: 'Settings',        url: '/settings', icon: Settings },
+      { title: 'Customers',       url: '/system/customers', icon: Users },
+      { title: 'Billing',         url: '/system/billing', icon: CreditCard },
+      { title: 'Infrastructure',  url: '/system/infrastructure', icon: Server },
+      { title: 'Control Centre',  url: '/system/control-centre', icon: LayoutGrid },
+      { title: 'User Management', url: '/system/users', icon: ShieldCheck },
+      { title: 'Audit Logs',      url: '/system/audit-logs', icon: FileClock },
+      { title: 'Settings',        url: '/system/settings', icon: Settings },
     ],
   },
 ]
@@ -170,7 +173,7 @@ function AppSidebarUser() {
               {user?.email}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/settings')}>
+            <DropdownMenuItem onClick={() => navigate('/system/settings')}>
               <User className="mr-2 h-4 w-4" /> Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />

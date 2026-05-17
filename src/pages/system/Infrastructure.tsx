@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { getServices, getSystem, getLogs } from '../api/endpoints'
-import StatusBadge from '../components/ui/StatusBadge'
+import { getServices, getSystem, getLogs } from '../../api/endpoints'
+import StatusBadge from '../../components/ui/StatusBadge'
 import { Server, Cpu, HardDrive, MemoryStick, RefreshCw } from 'lucide-react'
 
 function ProgressBar({ label, value, color = 'bg-accent' }: { label: string; value: number; color?: string }) {

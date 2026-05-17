@@ -159,9 +159,9 @@ export default function DashboardHome() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Trade Overview', to: '/trade',    icon: Activity },
-          { label: 'Customers',      to: '/clients',  icon: Users },
-          { label: 'Billing',        to: '/billing',  icon: DollarSign },
+          { label: 'Trade Overview', to: '/trade',             icon: Activity },
+          { label: 'Customers',      to: '/system/customers',  icon: Users },
+          { label: 'Billing',        to: '/system/billing',    icon: DollarSign },
         ].map(({ label, to, icon: Icon }) => (
           <button
             key={to}

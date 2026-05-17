@@ -3,16 +3,16 @@ import { useAuthStore } from './stores/auth'
 import Layout from './components/layout/Layout'
 import Login from './pages/Login'
 import DashboardHome from './pages/DashboardHome'
-import Billing from './pages/Billing'
-import Infrastructure from './pages/Infrastructure'
-import Settings from './pages/Settings'
-import ControlCentre  from './pages/admin/ControlCentre'
-import UserManagement from './pages/admin/UserManagement'
-import AuditLogs      from './pages/admin/AuditLogs'
-import CustomersLayout from './pages/admin/customers/Layout'
-import CustomersBuyers from './pages/admin/customers/Buyers'
-import CustomersLeads  from './pages/admin/customers/Leads'
-import BuyerDetail     from './pages/admin/customers/BuyerDetail'
+import Billing         from './pages/system/Billing'
+import Infrastructure  from './pages/system/Infrastructure'
+import Settings        from './pages/system/Settings'
+import ControlCentre   from './pages/system/ControlCentre'
+import UserManagement  from './pages/system/UserManagement'
+import AuditLogs       from './pages/system/AuditLogs'
+import CustomersLayout from './pages/system/customers/Layout'
+import CustomersBuyers from './pages/system/customers/Buyers'
+import CustomersLeads  from './pages/system/customers/Leads'
+import BuyerDetail     from './pages/system/customers/BuyerDetail'
 
 // Trade vertical
 //   * Trade · Business — Revenue / Users / Subscriptions. Read from
@@ -114,21 +114,30 @@ export default function App() {
           <Route path="edge"              element={<EdgeOverview />} />
           <Route path="edge/betting"      element={<EdgeOverview />} />
 
-          {/* Admin (cross-cutting) */}
-          <Route path="admin/customers" element={<CustomersLayout />}>
+          {/* System (cross-cutting). Renamed from "Admin" per ADMIN_IA §1. */}
+          <Route path="system/customers" element={<CustomersLayout />}>
             <Route index                          element={<CustomersBuyers />} />
             <Route path="leads"                   element={<CustomersLeads />} />
             <Route path="buyers/:paymentId"       element={<BuyerDetail />} />
           </Route>
-          {/* Legacy /clients routes redirect to the new unified customers surface */}
-          <Route path="clients"        element={<Navigate to="/admin/customers" replace />} />
-          <Route path="clients/:id"    element={<Navigate to="/admin/customers" replace />} />
-          <Route path="billing"        element={<Billing />} />
-          <Route path="infrastructure" element={<Infrastructure />} />
-          <Route path="settings"       element={<Settings />} />
-          <Route path="admin/control-centre" element={<ControlCentre />} />
-          <Route path="admin/users"          element={<UserManagement />} />
-          <Route path="admin/audit-logs"     element={<AuditLogs />} />
+          <Route path="system/billing"         element={<Billing />} />
+          <Route path="system/infrastructure"  element={<Infrastructure />} />
+          <Route path="system/settings"        element={<Settings />} />
+          <Route path="system/control-centre"  element={<ControlCentre />} />
+          <Route path="system/users"           element={<UserManagement />} />
+          <Route path="system/audit-logs"      element={<AuditLogs />} />
+
+          {/* Legacy redirects — preserve nav from bookmarks / external links. */}
+          <Route path="clients"               element={<Navigate to="/system/customers" replace />} />
+          <Route path="clients/:id"           element={<Navigate to="/system/customers" replace />} />
+          <Route path="billing"               element={<Navigate to="/system/billing" replace />} />
+          <Route path="infrastructure"        element={<Navigate to="/system/infrastructure" replace />} />
+          <Route path="settings"              element={<Navigate to="/system/settings" replace />} />
+          <Route path="admin/customers"       element={<Navigate to="/system/customers" replace />} />
+          <Route path="admin/customers/leads" element={<Navigate to="/system/customers/leads" replace />} />
+          <Route path="admin/control-centre"  element={<Navigate to="/system/control-centre" replace />} />
+          <Route path="admin/users"           element={<Navigate to="/system/users" replace />} />
+          <Route path="admin/audit-logs"      element={<Navigate to="/system/audit-logs" replace />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

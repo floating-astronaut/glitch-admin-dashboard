@@ -71,7 +71,7 @@ export default function BuyerDetail() {
   return (
     <div className="space-y-6">
       <button
-        onClick={() => navigate('/admin/customers')}
+        onClick={() => navigate('/system/customers')}
         className="flex items-center gap-1.5 text-xs text-g-muted hover:text-accent transition-colors"
       >
         <ArrowLeft size={12} /> Back to buyers
