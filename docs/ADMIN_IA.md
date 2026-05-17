@@ -114,32 +114,28 @@ exists; deeper is a smell). Anything deeper goes in-page (tabs, drawers).
 ## 2. Target sidebar IA
 
 The sidebar lists the four surfaces top-down, each with a small flat
-group of routes. Engine-internals stay grouped under Trade and gated to
-`OPERATOR_EMAIL`.
+group of routes. Single-user model — no gating, no per-user filters.
 
 ```
-Trade · Business           (all admins)
+Trade · Business
    Revenue
    Users
    Subscriptions
+   Billing
 
-Trade · Engine (personal)  (gated to OPERATOR_EMAIL)
+Grow
    Overview
-   Bots / Signals / Trades / Oracle / News
+   Customers
+   Users
+   Billing
 
-Grow                       (all admins; per-brand scoping later)
+Edge
    Overview
-   Sales Agent
-   Ads Agent
-   Social Agent
-   UGC Agent
-   SEO Agent
-   Voice Agent
+   Betting
+   Users
+   Billing
 
-Edge                       (all admins)
-   Overview / Betting
-
-System                     (renamed from "Admin")
+System
    Today           ← /
    Infrastructure  ← service heartbeat board
    Control Centre  ← global toggles, kill switches
@@ -154,9 +150,13 @@ Trade · Business now also carries **Billing** (moved from System in
 RELOC-1). Grow now also carries **Customers** (moved from System in
 RELOC-1) as the second item under Overview.
 
-The "Trade · Engine (personal)" gate is the only `gateEmail` group.
-Everything else is visible to every admin; per-brand scoping inside
-Grow is a *filter*, not an IA change.
+Trade · Engine internals (`/trade/engine` etc.) and the Grow
+per-agent shells (`/grow/sales/*`, `/grow/ads/*`, `/grow/social`,
+`/grow/ugc`, `/grow/seo`, `/grow/voice`) were **fully removed** in
+`ADMIN-TRIM-1` — routes, files, and palette/title entries. They live
+in the Trade and Grow apps themselves, not in this admin dashboard.
+The audit rows in §3 below describe their state at the time of the
+v1 audit; §6 v1.4 records the deletion.
 
 ---
 

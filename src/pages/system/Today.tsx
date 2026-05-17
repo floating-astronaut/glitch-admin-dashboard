@@ -18,8 +18,9 @@
  *   - NO business state (MRR / ARR / customer counts / tiers /
  *     account equity / trades-today / signals-today). Those live
  *     under Trade · Business or Trade · Engine, NOT under System.
- *   - NO Trade-engine internals. Engine status lives at
- *     `/trade/engine` (operator-gated) where it belongs.
+ *   - NO Trade-engine internals. Engine surfaces were removed from
+ *     the admin dashboard in ADMIN-TRIM-1; they live in the Trade
+ *     app itself.
  *   - Per-vertical revenue lives under the vertical. System pages
  *     stay platform-level only.
  */
