@@ -80,9 +80,12 @@ const NAV: NavGroup[] = [
     ],
   },
   {
+    // Split per ADMIN-1e: /edge is the platform-health Overview,
+    // /edge/betting is the betting accounts/positions surface.
     title: 'Edge',
     items: [
-      { title: 'Betting', url: '/edge', icon: Target },
+      { title: 'Overview', url: '/edge',         icon: LayoutDashboard, end: true },
+      { title: 'Betting',  url: '/edge/betting', icon: Target },
     ],
   },
   {

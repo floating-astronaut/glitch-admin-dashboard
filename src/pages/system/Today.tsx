@@ -276,8 +276,8 @@ export default function Today() {
           />
           <VerticalCard
             surface="Edge"
-            headline="Edge · Betting"
-            body="Accounts, signals, and routing for the Glitch Edge platform."
+            headline="Edge · Platform"
+            body="Service health for glitch-edge-api. Betting accounts and signals live under /edge/betting."
             to="/edge"
             icon={Target}
           />

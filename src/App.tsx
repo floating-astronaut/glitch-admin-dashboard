@@ -59,8 +59,10 @@ import AdsBsk002Campaigns from './pages/grow/ads/bsk002/Campaigns'
 import AdsBsk002Creatives from './pages/grow/ads/bsk002/Creatives'
 import AdsBsk002Reports   from './pages/grow/ads/bsk002/Reports'
 
-// Edge vertical
+// Edge vertical — split into Overview (platform health, /edge) and
+// Betting (accounts/positions/signals, /edge/betting) per ADMIN-1e.
 import EdgeOverview from './pages/edge/Overview'
+import EdgeBetting  from './pages/edge/Betting'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -129,9 +131,10 @@ export default function App() {
           <Route path="grow/budz/drafts"  element={<Navigate to="/grow/sales/budz/drafts" replace />} />
           <Route path="grow/budz/sends"   element={<Navigate to="/grow/sales/budz/sends" replace />} />
 
-          {/* Edge vertical */}
+          {/* Edge vertical — /edge is the platform overview, /edge/betting
+              is the betting accounts / positions / signals surface. */}
           <Route path="edge"              element={<EdgeOverview />} />
-          <Route path="edge/betting"      element={<EdgeOverview />} />
+          <Route path="edge/betting"      element={<EdgeBetting />} />
 
           {/* System (cross-cutting). Renamed from "Admin" per ADMIN_IA §1. */}
           <Route path="system/customers" element={<CustomersLayout />}>
