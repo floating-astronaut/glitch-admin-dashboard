@@ -1,14 +1,17 @@
 /**
  * Edge › Users — view into the Edge app's user database.
  *
- * Preview shell per ADMIN-SHELLS-1. Edge has its own app + database
- * for users (BYOK Cloudbet bettors via edge-app.glitchexecutor.com).
- * The user-shaped reads already exist on edge-api at /v1/me etc.
- * but are scoped to per-user JWTs; surfacing them aggregate from
- * the admin dashboard needs an admin/operator API layer on edge-api
- * (the same blocker as /edge/betting's deeper surfaces).
+ * Preview shell. Edge has its own app + database for users (BYOK
+ * Cloudbet bettors via edge-app.glitchexecutor.com). The user-shaped
+ * reads already exist on edge-api at /v1/me etc. but are scoped to
+ * per-user JWTs; surfacing them aggregate from the admin dashboard
+ * needs an admin/operator API layer on edge-api (same blocker as
+ * /edge/betting's deeper surfaces).
  */
-import { Users } from 'lucide-react'
+import {
+  Users, UserPlus, UserCheck, Link as LinkIcon,
+} from 'lucide-react'
+import KpiCard from '../../components/ui/KpiCard'
 import Card from '../../components/ui/Surface'
 import EmptyState from '../../components/ui/EmptyState'
 
@@ -27,6 +30,13 @@ export default function EdgeUsers() {
             <code className="font-mono">/system/users</code>).
           </p>
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard label="Total bettors"          value="—" icon={Users}     sub="needs edge-api /v1/admin/*" />
+        <KpiCard label="Active (30d)"           value="—" icon={UserCheck} sub="—" />
+        <KpiCard label="Signups (7d)"           value="—" icon={UserPlus}  sub="—" />
+        <KpiCard label="Cloudbet-connected"     value="—" icon={LinkIcon}  sub="—" />
       </div>
 
       <Card>

@@ -11,9 +11,41 @@ Body text (if present) shown as indented sub-bullets.
 
 ---
 
+## 2026-05-18
+
+- **03:30 UTC** — auto-sync: 2026-05-18 03:30 UTC (`1eedfb8`) — 8 files
+        M	src/pages/edge/Betting.tsx
+        M	src/pages/edge/Billing.tsx
+        M	src/pages/edge/Users.tsx
+        M	src/pages/grow/Billing.tsx
+        M	src/pages/grow/Overview.tsx
+        ... (+3 more)
+
 ## 2026-05-17
 
-- **23:15 UTC** — auto-sync: 2026-05-17 23:15 UTC (`0702e6f`) — 33 files
+- **23:29 UTC** — feat(ADMIN-AUTH-1): single-user login polish + deep-link preservation (`c2b1e4e`) — 3 files
+    Small follow-on to TRIM-1: complete the dashboard-side of the
+    admin@glitchexecutor.com single-user binding. Pure UX, no contract
+    changes, no backend work.
+    src/pages/Login.tsx
+      Email field defaults to admin@glitchexecutor.com.
+      Password input auto-focuses on mount (email is pre-filled, so
+      the operator can just type their password and hit enter).
+      Subtitle clarifies that this is a single-user console.
+      New yellow "Session expired" banner when the user lands here
+      from AuthGuard's redirect — surfaces the deep link they were
+- **23:17 UTC** — refactor(ADMIN-TRIM-1): lock dashboard to business-operator surfaces (single-user model) (`9340f14`) — 3 files
+    Operator locked the final sidebar:
+      Trade · Business   Revenue / Users / Subscriptions / Billing
+      Grow               Overview / Customers / Users / Billing
+      Edge               Overview / Betting / Users / Billing
+      System             Today / Infrastructure / Control Centre /
+                         User Management / Audit Logs / Settings
+    And confirmed the single-user binding: "for dashboard there will
+    never be any user, bind it to admin@glitchexecutor.com". This trims
+    the dashboard to business-operator surfaces only and removes the dead
+    email-gating ceremony.
+- **23:15 UTC** — auto-sync: 2026-05-17 23:15 UTC (`311b504`) — 34 files
         M	docs/ADMIN_IA.md
         M	src/App.tsx
         M	src/api/grow.ts

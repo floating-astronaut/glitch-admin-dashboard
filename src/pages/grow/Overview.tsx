@@ -4,15 +4,19 @@
  * v1.4 IA: Grow in the admin dashboard carries Overview / Customers /
  * Users / Billing only. Per-agent operations live elsewhere (out of
  * the admin dashboard). This page is the surface-grid into Grow's
- * three deep operator surfaces.
+ * three deep operator surfaces + a cross-Grow KPI snapshot up top.
  */
+import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import {
-  ArrowRight, CreditCard, ShoppingCart, Sprout, Users,
-  type LucideIcon,
+  ArrowRight, CheckCircle, CreditCard, MailQuestion, ShoppingCart,
+  Sprout, Users, XCircle, type LucideIcon,
 } from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns'
+import KpiCard from '../../components/ui/KpiCard'
 import Card from '../../components/ui/Surface'
 import Section from '../../components/ui/Section'
+import { customersBuyers, customersLeads } from '../../api/grow'
 
 function SurfaceCard({
   headline, body, to, icon: Icon,
@@ -41,6 +45,33 @@ function SurfaceCard({
 }
 
 export default function GrowOverview() {
+  const buyersQ = useQuery({
+    queryKey: ['grow:overview:buyers'],
+    // Pull a generous slice so client-side roll-ups (fulfilled,
+    // refunded, most-recent) are accurate without paginating.
+    queryFn: () => customersBuyers({ limit: 500 }),
+    refetchInterval: 60_000,
+  })
+  const leadsQ = useQuery({
+    queryKey: ['grow:overview:leads'],
+    queryFn: customersLeads,
+    refetchInterval: 60_000,
+  })
+
+  const buyers = buyersQ.data?.buyers ?? []
+  const buyersCount = buyersQ.data?.count ?? 0
+  const leadsCount = leadsQ.data?.count ?? 0
+  const fulfilled = buyers.filter(b => b.fulfilled_at && !b.refunded_at).length
+  const refunded  = buyers.filter(b => b.refunded_at).length
+  const latest    = buyers
+    .map(b => b.created_at ? new Date(b.created_at).valueOf() : 0)
+    .filter(t => t > 0)
+    .sort((a, b) => b - a)[0]
+
+  const latestLabel = latest
+    ? formatDistanceToNow(new Date(latest), { addSuffix: true })
+    : '—'
+
   return (
     <div className="space-y-6">
       <div className="flex items-start gap-3">
@@ -54,6 +85,37 @@ export default function GrowOverview() {
             customer-user database, and Grow-side billing.
           </p>
         </div>
+      </div>
+
+      {/* Cross-Grow snapshot — derived from /api/customers/buyers +
+          /api/customers/leads. */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard
+          label="Paid buyers"
+          value={buyersQ.isLoading ? '…' : buyersCount}
+          icon={ShoppingCart}
+          accent
+          sub={`latest ${latestLabel}`}
+        />
+        <KpiCard
+          label="Fulfilled"
+          value={buyersQ.isLoading ? '…' : fulfilled}
+          icon={CheckCircle}
+          sub={buyersCount > 0 ? `${Math.round((fulfilled / buyersCount) * 100)}% of total` : ''}
+        />
+        <KpiCard
+          label="Refunded"
+          value={buyersQ.isLoading ? '…' : refunded}
+          icon={XCircle}
+          sub={buyersCount > 0 ? `${Math.round((refunded / buyersCount) * 100)}% of total` : ''}
+          trend={refunded > 0 ? 'down' : 'neutral'}
+        />
+        <KpiCard
+          label="Vibe Kit leads"
+          value={leadsQ.isLoading ? '…' : leadsCount}
+          icon={MailQuestion}
+          sub="Google Sheet + Resend audience"
+        />
       </div>
 
       <Section title="Surfaces">

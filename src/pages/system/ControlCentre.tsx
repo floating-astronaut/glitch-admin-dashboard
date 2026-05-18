@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   getCC_Containers, restartContainer,
-  getCC_System, getCC_Redis, getCC_Postgres, getCC_Logs,
+  getCC_Redis, getCC_Postgres, getCC_Logs,
 } from '../../api/endpoints'
 import {
-  RefreshCw, Cpu, HardDrive, MemoryStick, Database,
+  RefreshCw, Database,
   Activity, Terminal, AlertTriangle, CheckCircle2, XCircle, Clock,
 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -33,6 +34,9 @@ function StatusDot({ status, health }: { status: string; health: string }) {
   return <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
 }
 
+// ResourceBar removed — host CPU/memory/disk live at Infrastructure.
+// Kept the function below for future Redis/Postgres usage gauges if
+// they're added back later.
 function ResourceBar({ value, label, color = 'accent' }: { value: number; label: string; color?: string }) {
   const cls = color === 'red'    ? 'bg-red-500'
             : color === 'yellow' ? 'bg-yellow-400'
@@ -171,11 +175,6 @@ export default function ControlCentre() {
     queryFn: getCC_Containers,
     refetchInterval: 15_000,
   })
-  const { data: sys } = useQuery({
-    queryKey: ['cc:system'],
-    queryFn: getCC_System,
-    refetchInterval: 15_000,
-  })
   const { data: redis } = useQuery({
     queryKey: ['cc:redis'],
     queryFn: getCC_Redis,
@@ -214,41 +213,15 @@ export default function ControlCentre() {
         </div>
       </div>
 
-      {/* System resources */}
-      {sys && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="rounded-xl border border-g-border bg-g-card p-4 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-white">
-              <Cpu size={15} className="text-accent" /> CPU
-            </div>
-            <ResourceBar
-              value={sys.cpu_percent}
-              label="Usage"
-              color={sys.cpu_percent > 80 ? 'red' : sys.cpu_percent > 60 ? 'yellow' : 'accent'}
-            />
-          </div>
-          <div className="rounded-xl border border-g-border bg-g-card p-4 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-white">
-              <MemoryStick size={15} className="text-accent" /> Memory
-            </div>
-            <ResourceBar
-              value={sys.memory.percent}
-              label={`${sys.memory.used_gb}GB / ${sys.memory.total_gb}GB`}
-              color={sys.memory.percent > 85 ? 'red' : sys.memory.percent > 70 ? 'yellow' : 'accent'}
-            />
-          </div>
-          <div className="rounded-xl border border-g-border bg-g-card p-4 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-white">
-              <HardDrive size={15} className="text-accent" /> Disk
-            </div>
-            <ResourceBar
-              value={sys.disk.percent}
-              label={`${sys.disk.used_gb}GB / ${sys.disk.total_gb}GB`}
-              color={sys.disk.percent > 90 ? 'red' : sys.disk.percent > 75 ? 'yellow' : 'accent'}
-            />
-          </div>
-        </div>
-      )}
+      {/* CPU / memory / disk live at /system/infrastructure — see the
+          v1.4 IA dedup. Control Centre focuses on container ops + the
+          Redis / Postgres state-store snapshots below. */}
+      <div className="rounded-xl border border-g-border bg-g-card/40 p-3 flex items-center justify-between text-xs text-g-muted">
+        <span>Host CPU / memory / disk live at Infrastructure.</span>
+        <Link to="/system/infrastructure" className="inline-flex items-center gap-1 hover:text-accent">
+          open Infrastructure <RefreshCw size={11} />
+        </Link>
+      </div>
 
       {/* Redis + Postgres stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

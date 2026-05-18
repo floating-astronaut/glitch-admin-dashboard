@@ -1,13 +1,17 @@
 /**
  * Grow › Users — view into the Grow app's user database.
  *
- * Preview shell per ADMIN-SHELLS-1. Grow has its own app + database
- * for users (separate from Trade subscribers and Edge bettors per
- * the v1.1 ownership rule). When the operator API on the Grow app
- * exposes a read endpoint, this page wires to it the same way
- * /grow/customers wires to admin_api `/api/customers/buyers`.
+ * Preview shell. Grow has its own app + database for users (separate
+ * from Trade subscribers and Edge bettors per the v1.1 ownership
+ * rule). When the operator API on the Grow app exposes a read
+ * endpoint, this page wires to it the same way /grow/customers
+ * wires to admin_api `/api/customers/buyers`.
+ *
+ * The four KPI cards below are placeholder previews — they name the
+ * shape this surface will take.
  */
-import { Users } from 'lucide-react'
+import { Users, UserPlus, UserCheck, Link as LinkIcon } from 'lucide-react'
+import KpiCard from '../../components/ui/KpiCard'
 import Card from '../../components/ui/Surface'
 import EmptyState from '../../components/ui/EmptyState'
 
@@ -26,6 +30,13 @@ export default function GrowUsers() {
             and admin operators (see <code className="font-mono">/system/users</code>).
           </p>
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard label="Total users"      value="—" icon={Users}     sub="needs Grow operator API" />
+        <KpiCard label="Active (30d)"     value="—" icon={UserCheck} sub="—" />
+        <KpiCard label="Signups (7d)"     value="—" icon={UserPlus}  sub="—" />
+        <KpiCard label="Connected brands" value="—" icon={LinkIcon}  sub="—" />
       </div>
 
       <Card>

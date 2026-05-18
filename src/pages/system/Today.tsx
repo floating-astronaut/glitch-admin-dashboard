@@ -2,37 +2,32 @@
  * System › Today — the dashboard root.
  *
  * Per docs/ADMIN_IA.md §1: the root (`/`) is the cross-surface
- * System overview, not a Trade-only page. This file replaces the
- * pre-app-era `pages/DashboardHome.tsx`, which mixed Trade engine
- * KPIs, customer counts, and MRR into a single landing card grid.
- *
- * Composition (top-to-bottom):
- *   - Critical/active alerts strip (cross-product)
- *   - Infrastructure heartbeat: services up/down summary + CPU/mem/disk
- *   - Cross-vertical activity feed
- *   - Vertical entry cards: links into Trade · Business / Grow /
- *     Edge / System sub-routes (the operator's "where do I go next?"
- *     surface)
+ * System overview. Cross-vertical business snapshot up top + alerts
+ * + service heartbeat link + surface-entry grid + recent activity.
  *
  * Strict ownership boundary per the IA's Appendix invariants:
- *   - NO business state (MRR / ARR / customer counts / tiers /
- *     account equity / trades-today / signals-today). Those live
- *     under Trade · Business or Trade · Engine, NOT under System.
+ *   - NO per-vertical business detail (per-tier MRR breakdowns,
+ *     customer lists, etc.). Those live under each vertical.
+ *   - NO infrastructure detail (CPU / memory / disk progress bars).
+ *     Those live under `/system/infrastructure` per the v1.4 IA
+ *     dedup pass; we only show a one-line service-up summary here.
  *   - NO Trade-engine internals. Engine surfaces were removed from
  *     the admin dashboard in ADMIN-TRIM-1; they live in the Trade
  *     app itself.
- *   - Per-vertical revenue lives under the vertical. System pages
- *     stay platform-level only.
  */
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import {
-  Activity, AlertCircle, ArrowRight, BarChart3, Bot, Cpu,
-  HardDrive, MemoryStick, RefreshCw, Server, LayoutGrid, Target,
+  Activity, AlertCircle, ArrowRight, BarChart3, Bot, CreditCard,
+  LayoutGrid, RefreshCw, Server, ShoppingCart, Target,
   type LucideIcon,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import { getAlerts, getActivity, getServices, getSystem } from '../../api/endpoints'
+import { getAlerts, getActivity, getServices } from '../../api/endpoints'
+import { getTradeMetrics } from '../../api/tradeAdmin'
+import { customersBuyers, customersLeads } from '../../api/grow'
+import { edgeHealthz } from '../../api/edge'
+import KpiCard from '../../components/ui/KpiCard'
 import Section from '../../components/ui/Section'
 import Card from '../../components/ui/Surface'
 import DataTable, { Column } from '../../components/ui/DataTable'
@@ -47,47 +42,12 @@ interface ServiceRow {
   status: string
 }
 
-interface SystemMetrics {
-  cpu_percent?: number
-  memory?: { percent?: number }
-  disk?: { percent?: number }
-}
-
 interface ActivityRow {
   type: string
   customer?: string
   symbol?: string
   action?: string
   created_at?: string
-}
-
-function ProgressBar({
-  label, value, icon: Icon,
-}: {
-  label: string
-  value: number
-  icon?: LucideIcon
-}) {
-  const color = value > 85 ? 'bg-red-400'
-              : value > 70 ? 'bg-yellow-400'
-              :              'bg-accent'
-  return (
-    <div>
-      <div className="flex items-center justify-between text-xs text-g-muted mb-1">
-        <span className="flex items-center gap-1.5">
-          {Icon && <Icon size={12} />}
-          {label}
-        </span>
-        <span className="text-g-text font-mono">{value.toFixed(0)}%</span>
-      </div>
-      <div className="h-1.5 bg-g-border rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all ${color}`}
-          style={{ width: `${Math.min(100, value)}%` }}
-        />
-      </div>
-    </div>
-  )
 }
 
 function VerticalCard({
@@ -117,7 +77,39 @@ function VerticalCard({
   )
 }
 
+function fmtMoney(n: number) {
+  return `$${n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+}
+
 export default function Today() {
+  // Cross-vertical business snapshots — one-line read per surface.
+  const tradeQ = useQuery({
+    queryKey: ['today:trade-metrics'],
+    queryFn: getTradeMetrics,
+    refetchInterval: 60_000,
+    retry: 1,
+  })
+  const buyersQ = useQuery({
+    queryKey: ['today:grow-buyers'],
+    queryFn: () => customersBuyers({ limit: 1 }),
+    refetchInterval: 60_000,
+    retry: 1,
+  })
+  const leadsQ = useQuery({
+    queryKey: ['today:grow-leads'],
+    queryFn: customersLeads,
+    refetchInterval: 60_000,
+    retry: 1,
+  })
+  const edgeQ = useQuery({
+    queryKey: ['today:edge-health'],
+    queryFn: edgeHealthz,
+    refetchInterval: 30_000,
+    retry: 1,
+  })
+
+  // Platform health — one-line service summary; full metrics live at
+  // /system/infrastructure (no CPU/mem/disk bars duplicated here).
   const { data: alerts = [] } = useQuery<Alert[]>({
     queryKey: ['alerts'],
     queryFn: getAlerts,
@@ -128,11 +120,6 @@ export default function Today() {
     queryFn: getServices,
     refetchInterval: 30_000,
   })
-  const { data: system } = useQuery<SystemMetrics>({
-    queryKey: ['system'],
-    queryFn: getSystem,
-    refetchInterval: 10_000,
-  })
   const { data: activity = [], isLoading: actLoading } = useQuery<ActivityRow[]>({
     queryKey: ['activity'],
     queryFn: getActivity,
@@ -140,8 +127,8 @@ export default function Today() {
   })
 
   const upCount   = services.filter(s => s.status === 'active' || s.status === 'running').length
-  const downCount = services.filter(s => s.status === 'failed' || s.status === 'inactive').length
   const totalSvc  = services.length
+  const downSvc   = services.filter(s => s.status === 'failed' || s.status === 'inactive')
 
   const activityCols: Column<ActivityRow>[] = [
     {
@@ -170,8 +157,6 @@ export default function Today() {
 
   return (
     <div className="space-y-6">
-      {/* Header strip — read-only context so the operator knows the
-          dashboard root is the System overview, not a Trade page. */}
       <div>
         <div className="flex items-center gap-2 text-[10px] uppercase tracking-wide text-g-dim">
           <Server size={12} /> System › Today
@@ -180,9 +165,50 @@ export default function Today() {
           Cross-surface ops snapshot
         </h1>
         <p className="mt-0.5 text-xs text-g-muted">
-          Infra heartbeat, active alerts, recent activity across Trade · Grow · Edge · System.
-          Business state (MRR, customers, account equity) lives under each owning vertical.
+          One-line read per vertical (Trade · Grow · Edge), active alerts,
+          and recent activity. Infrastructure detail (CPU / memory / disk,
+          per-service state) lives at{' '}
+          <Link to="/system/infrastructure" className="text-accent hover:underline">/system/infrastructure</Link>.
         </p>
+      </div>
+
+      {/* Cross-vertical business snapshot — one KPI card per surface,
+          plus a System alert counter. Sources are the same APIs each
+          owning surface reads from, so numbers stay in sync. */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard
+          label="Trade · MRR"
+          value={tradeQ.data ? fmtMoney(tradeQ.data.mrr_usd) : tradeQ.isLoading ? '…' : '—'}
+          icon={BarChart3}
+          accent
+          sub={tradeQ.data
+            ? `${tradeQ.data.active_subscriptions} active subs`
+            : tradeQ.isError ? 'trade-admin unreachable' : ''}
+        />
+        <KpiCard
+          label="Grow · Buyers"
+          value={buyersQ.data?.count ?? (buyersQ.isLoading ? '…' : '—')}
+          icon={ShoppingCart}
+          sub={leadsQ.data ? `${leadsQ.data.count} lead${leadsQ.data.count === 1 ? '' : 's'}` : ''}
+        />
+        <KpiCard
+          label="Edge · Status"
+          value={edgeQ.isLoading ? '…' : edgeQ.isSuccess ? 'reachable' : 'unreachable'}
+          icon={Target}
+          accent={edgeQ.isSuccess}
+          sub={edgeQ.data?.env ?? (edgeQ.isError ? 'edge-api down' : '')}
+          trend={edgeQ.isSuccess ? 'up' : 'down'}
+        />
+        <KpiCard
+          label="Alerts"
+          value={alerts.length}
+          icon={AlertCircle}
+          accent={alerts.length > 0}
+          sub={alerts.filter(a => a.severity === 'critical').length > 0
+            ? `${alerts.filter(a => a.severity === 'critical').length} critical`
+            : alerts.length === 0 ? 'all clear' : ''}
+          trend={alerts.length === 0 ? 'up' : 'down'}
+        />
       </div>
 
       {/* Alerts strip (cross-product) */}
@@ -204,56 +230,34 @@ export default function Today() {
         </div>
       )}
 
-      {/* Infra heartbeat */}
+      {/* One-line service summary — no CPU/MEM/DISK here (lives at
+          /system/infrastructure per the v1.4 IA dedup). */}
       <Card>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-            <Server size={14} className="text-g-muted" />
-            Infrastructure
-          </h2>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-g-muted inline-flex items-center gap-1.5">
+            <RefreshCw size={12} /> Services
+          </span>
           <Link to="/system/infrastructure" className="text-[11px] text-g-muted hover:text-accent inline-flex items-center gap-1">
-            full board <ArrowRight size={10} />
+            full infra board <ArrowRight size={10} />
           </Link>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Service heartbeat */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-g-muted inline-flex items-center gap-1.5">
-                <RefreshCw size={12} /> Services
-              </span>
-              <span className="font-mono text-g-text">
-                {svcLoading ? '…' : (
-                  <>
-                    <span className="text-emerald-400">{upCount}</span>
-                    {' / '}
-                    <span className={downCount > 0 ? 'text-red-400' : 'text-g-text'}>{totalSvc}</span>
-                    {' running'}
-                  </>
-                )}
-              </span>
-            </div>
-            {downCount > 0 && services
-              .filter(s => s.status === 'failed' || s.status === 'inactive')
-              .slice(0, 4)
-              .map(s => (
-                <div key={s.name} className="flex items-center justify-between text-xs">
-                  <span className="font-mono text-g-text truncate">{s.name}</span>
-                  <span className="text-red-400">{s.status}</span>
-                </div>
-              ))}
-            {downCount === 0 && !svcLoading && (
-              <p className="text-xs text-g-dim">All registered services are up.</p>
+        <div className="mt-2 flex items-center justify-between">
+          <span className="font-mono text-sm text-g-text">
+            {svcLoading ? '…' : (
+              <>
+                <span className="text-emerald-400">{upCount}</span>
+                {' / '}
+                <span className={downSvc.length > 0 ? 'text-red-400' : 'text-g-text'}>{totalSvc}</span>
+                {' running'}
+              </>
             )}
-          </div>
-
-          {/* CPU / mem / disk */}
-          <div className="space-y-3">
-            <ProgressBar label="CPU"    value={system?.cpu_percent ?? 0}      icon={Cpu} />
-            <ProgressBar label="Memory" value={system?.memory?.percent ?? 0}  icon={MemoryStick} />
-            <ProgressBar label="Disk"   value={system?.disk?.percent ?? 0}    icon={HardDrive} />
-          </div>
+          </span>
+          {downSvc.length > 0 && (
+            <span className="text-xs text-red-400 truncate max-w-[60%]">
+              down: {downSvc.slice(0, 3).map(s => s.name).join(', ')}
+              {downSvc.length > 3 ? ` +${downSvc.length - 3}` : ''}
+            </span>
+          )}
         </div>
       </Card>
 
@@ -263,7 +267,7 @@ export default function Today() {
           <VerticalCard
             surface="Trade"
             headline="Trade · Business"
-            body="Revenue, users, subscriptions for the Glitch Trade SaaS."
+            body="Revenue, users, subscriptions, billing for the Glitch Trade SaaS."
             to="/trade"
             icon={BarChart3}
           />
@@ -281,10 +285,6 @@ export default function Today() {
             to="/edge"
             icon={Target}
           />
-          {/* System self-card points at a platform-ops surface, not at
-              business-operational data. Per the 2026-05-17 supervisor
-              clarification, customer/billing/user state belongs to the
-              owning vertical (Trade/Grow/Edge), not to System. */}
           <VerticalCard
             surface="System"
             headline="Control Centre"
@@ -311,9 +311,11 @@ export default function Today() {
         <Activity size={12} className="shrink-0 mt-0.5" />
         <div>
           <p>
-            This is the System overview. Trade engine status, account equity, MRR, customer
-            tiers, and per-vertical KPIs live under their owning surface — open the relevant
-            vertical from the sidebar or the cards above.
+            This is the System overview. CPU / memory / disk lives at{' '}
+            <Link to="/system/infrastructure" className="text-accent hover:underline">Infrastructure</Link>;
+            container / queue / log operations at{' '}
+            <Link to="/system/control-centre" className="text-accent hover:underline">Control Centre</Link>;
+            per-vertical KPIs under their owning surface.
           </p>
         </div>
       </div>
