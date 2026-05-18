@@ -87,7 +87,7 @@ export const navItems: NavGroup[] = [
       { title: 'Infrastructure',  href: '#',                              icon: ServerIcon,          isComing: true },
       { title: 'Server Map',      href: '/dashboard/system/server-map',   icon: NetworkIcon },
       { title: 'Control Centre',  href: '#',                              icon: LayoutGridIcon,      isComing: true },
-      { title: 'User Management', href: '#',                              icon: ShieldCheckIcon,     isComing: true },
+      { title: 'User Management', href: '/dashboard/system/users',        icon: ShieldCheckIcon },
       { title: 'Audit Logs',      href: '/dashboard/system/audit-logs',   icon: FileClockIcon },
       { title: 'Settings',        href: '/dashboard/system/settings',     icon: SettingsIcon },
     ],
