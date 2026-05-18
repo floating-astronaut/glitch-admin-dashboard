@@ -13,7 +13,33 @@ Body text (if present) shown as indented sub-bullets.
 
 ## 2026-05-18
 
-- **13:45 UTC** — auto-sync: 2026-05-18 13:45 UTC (`34d378c`) — 9 files
+- **14:15 UTC** — auto-sync: 2026-05-18 14:15 UTC (`335f05c`) — 3 files
+        A	components/providers/query-provider.tsx
+        M	package.json
+        M	pnpm-lock.yaml
+- **14:12 UTC** — refactor(ADMIN-V2-SHELL): Sales + Analytics → reusable kit-blocks; drop their routes (`44096d9`) — 22 files
+    Operator clarified: Sales + Website Analytics from the kit were meant
+    as a parts bin, not user-facing routes. The pages themselves never
+    fit our v1.4 IA — the kit-shipped cards/charts/tables do, when reused
+    inside our domain pages.
+    Moves
+      app/dashboard/(auth)/sales/components/         → components/kit-blocks/sales/
+      app/dashboard/(auth)/website-analytics/components/ → components/kit-blocks/website-analytics/
+      (internal sibling imports keep working; @/components/ui/* absolute
+       imports keep working; the only consumer that broke was each
+       page.tsx, which we're deleting anyway.)
+- **13:54 UTC** — fix(ADMIN-V2-DEPLOY): switch to Next.js static export — sidestep CF Workers cap (`387d220`) — 2 files
+    Earlier next-on-pages deploy hit the 3 MiB free-tier Workers cap
+    (4.16 MiB compressed). Operator chose static export over the $5/mo
+    Workers Paid upgrade.
+    next.config.ts
+      Added `output: "export"` so every route prerenders to a static
+      HTML file. `images.unoptimized: true` because next/image's
+      optimizer is server-only.
+    app/layout.tsx
+      Dropped `await cookies()` + the theme-cookie reads. The kit used
+      these to avoid a theme flash on first paint; with static export
+- **13:45 UTC** — auto-sync: 2026-05-18 13:45 UTC (`b6c68ea`) — 10 files
         M	app/dashboard/(auth)/layout.tsx
         M	app/dashboard/(auth)/sales/page.tsx
         M	app/dashboard/(auth)/website-analytics/page.tsx
