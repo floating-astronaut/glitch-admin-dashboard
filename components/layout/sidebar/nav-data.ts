@@ -59,7 +59,7 @@ export const navItems: NavGroup[] = [
       { title: 'Revenue',       href: '#', icon: LayoutDashboardIcon, isComing: true },
       { title: 'Users',         href: '#', icon: UsersIcon,           isComing: true },
       { title: 'Subscriptions', href: '#', icon: CreditCardIcon,      isComing: true },
-      { title: 'Billing',       href: '#', icon: CreditCardIcon,      isComing: true },
+      { title: 'Billing',       href: '/dashboard/trade/billing', icon: CreditCardIcon },
     ],
   },
   {
