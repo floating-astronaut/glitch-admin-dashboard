@@ -88,8 +88,8 @@ export const navItems: NavGroup[] = [
       { title: 'Server Map',      href: '/dashboard/system/server-map',   icon: NetworkIcon },
       { title: 'Control Centre',  href: '#',                              icon: LayoutGridIcon,      isComing: true },
       { title: 'User Management', href: '#',                              icon: ShieldCheckIcon,     isComing: true },
-      { title: 'Audit Logs',      href: '#',                              icon: FileClockIcon,       isComing: true },
-      { title: 'Settings',        href: '#',                              icon: SettingsIcon,        isComing: true },
+      { title: 'Audit Logs',      href: '/dashboard/system/audit-logs',   icon: FileClockIcon },
+      { title: 'Settings',        href: '/dashboard/system/settings',     icon: SettingsIcon },
     ],
   },
 ]
