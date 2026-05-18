@@ -8,13 +8,14 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { FileClock, RefreshCw } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow, format as fmtDate } from 'date-fns'
 import { getAuditLog } from '../../api/endpoints'
 import Card from '../../components/ui/Surface'
 import Section from '../../components/ui/Section'
 import EmptyState from '../../components/ui/EmptyState'
 import ErrorState from '../../components/ui/ErrorState'
 import DataTable, { Column } from '../../components/ui/DataTable'
+import Modal from '../../components/ui/Modal'
 import { TableToolbar, Pagination } from '../../components/ui/TableToolbar'
 
 interface AuditEntry {
@@ -35,11 +36,21 @@ interface AuditPage {
   entries: AuditEntry[]
 }
 
+function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-3 text-xs">
+      <span className="w-28 shrink-0 text-g-muted uppercase tracking-wide text-[10px] pt-0.5">{label}</span>
+      <span className="flex-1 text-g-text break-words">{children}</span>
+    </div>
+  )
+}
+
 export default function AuditLogs() {
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(50)
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [selected, setSelected] = useState<AuditEntry | null>(null)
 
   const { data, isLoading, isError, refetch } = useQuery<AuditPage>({
     queryKey: ['audit-log', page, limit, dateFrom, dateTo],
@@ -170,6 +181,7 @@ export default function AuditLogs() {
                   data={entries}
                   loading={isLoading}
                   emptyText="No audit events"
+                  onRowClick={setSelected}
                 />
                 <Pagination
                   page={page}
@@ -181,6 +193,71 @@ export default function AuditLogs() {
           </>
         )}
       </Section>
+
+      <Modal
+        open={Boolean(selected)}
+        onClose={() => setSelected(null)}
+        title={selected ? `Audit · ${selected.action}` : ''}
+        size="lg"
+      >
+        {selected && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <DetailRow label="Event ID">
+                <span className="font-mono">{selected.id}</span>
+              </DetailRow>
+              <DetailRow label="When">
+                <span title={selected.created_at}>
+                  {fmtDate(new Date(selected.created_at), "yyyy-MM-dd HH:mm:ss 'UTC'")}
+                  <span className="ml-2 text-g-muted">
+                    ({formatDistanceToNow(new Date(selected.created_at), { addSuffix: true })})
+                  </span>
+                </span>
+              </DetailRow>
+              <DetailRow label="Actor">
+                {selected.admin_email
+                  ? <span className="font-mono">{selected.admin_email}</span>
+                  : <span className="text-g-dim">system</span>}
+              </DetailRow>
+              <DetailRow label="Action">
+                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/30">
+                  {selected.action}
+                </span>
+              </DetailRow>
+              <DetailRow label="Target">
+                {selected.target_type
+                  ? (
+                    <span className="font-mono">
+                      {selected.target_type}
+                      {selected.target_id ? ` · ${selected.target_id}` : ''}
+                    </span>
+                  )
+                  : <span className="text-g-dim">—</span>}
+              </DetailRow>
+              <DetailRow label="IP">
+                {selected.ip_address
+                  ? <span className="font-mono">{selected.ip_address}</span>
+                  : <span className="text-g-dim">—</span>}
+              </DetailRow>
+            </div>
+
+            <div>
+              <div className="text-[10px] uppercase tracking-wide text-g-muted mb-1.5">Details</div>
+              {selected.details && (typeof selected.details === 'object'
+                ? Object.keys(selected.details).length > 0
+                : String(selected.details).length > 0)
+                ? (
+                  <pre className="text-[11px] font-mono text-g-text bg-g-deep border border-g-border rounded-lg p-3 overflow-x-auto whitespace-pre-wrap break-all">
+                    {typeof selected.details === 'string'
+                      ? selected.details
+                      : JSON.stringify(selected.details, null, 2)}
+                  </pre>
+                )
+                : <span className="text-xs text-g-dim">—</span>}
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

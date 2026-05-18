@@ -13,14 +13,16 @@
  * grow-dashboard) are a separate, newer lead pipeline and are not
  * yet merged in here. That merge is its own follow-up lane.
  */
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { MailQuestion, RefreshCw } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow, format as fmtDate } from 'date-fns'
 import { customersLeads } from '../../../api/grow'
 import Card from '../../../components/ui/Surface'
 import ErrorState from '../../../components/ui/ErrorState'
 import EmptyState from '../../../components/ui/EmptyState'
 import DataTable, { Column } from '../../../components/ui/DataTable'
+import Modal from '../../../components/ui/Modal'
 
 interface LeadRow {
   email?: string
@@ -42,6 +44,8 @@ function pickCreatedAt(r: LeadRow): string | undefined {
 }
 
 export default function CustomersLeads() {
+  const [selected, setSelected] = useState<LeadRow | null>(null)
+
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['customers', 'leads'],
     queryFn: customersLeads,
@@ -99,8 +103,8 @@ export default function CustomersLeads() {
       <Card className="flex items-center gap-3">
         <p className="text-xs text-g-muted flex-1">
           Vibe Kit leads — Google Sheet <code className="font-mono">kit-leads</code> merged
-          with the Resend <code className="font-mono">kit-leads</code> audience. Click into
-          a row for the lead profile (deferred — see <code className="font-mono">customer-mgmt-design.md</code>).
+          with the Resend <code className="font-mono">kit-leads</code> audience. Click a
+          row to inspect the full lead record.
         </p>
         <span className="text-[10px] text-g-dim font-mono">
           {data ? `${count} lead${count === 1 ? '' : 's'}` : '—'}
@@ -133,8 +137,81 @@ export default function CustomersLeads() {
           data={leads}
           loading={isLoading}
           emptyText="No leads"
+          onRowClick={setSelected}
         />
       )}
+
+      <Modal
+        open={Boolean(selected)}
+        onClose={() => setSelected(null)}
+        title={selected ? `Lead · ${selected.email ?? selected.name ?? 'detail'}` : ''}
+        size="lg"
+      >
+        {selected && (() => {
+          const t = pickCreatedAt(selected)
+          // Surface common fields first, then everything else as the
+          // raw record — lead shape is loose upstream (Google Sheet +
+          // Resend merge), so a defensive "show whatever we got" works
+          // better than a fixed schema.
+          const primaryKeys = ['email', 'name', 'full_name', 'first_name', 'last_name', 'source', 'status']
+          const primary = primaryKeys
+            .map(k => [k, selected[k]] as const)
+            .filter(([, v]) => v !== undefined && v !== null && v !== '')
+          const handled = new Set([...primaryKeys, 'created_at', 'captured_at', 'signed_up_at', 'timestamp'])
+          const rest = Object.entries(selected).filter(([k, v]) =>
+            !handled.has(k) && v !== undefined && v !== null && v !== ''
+          )
+          return (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                {primary.length > 0 ? primary.map(([k, v]) => (
+                  <div key={k} className="flex items-start gap-3 text-xs">
+                    <span className="w-28 shrink-0 text-g-muted uppercase tracking-wide text-[10px] pt-0.5">
+                      {k.replace(/_/g, ' ')}
+                    </span>
+                    <span className="flex-1 text-g-text break-words font-mono">
+                      {String(v)}
+                    </span>
+                  </div>
+                )) : (
+                  <p className="text-xs text-g-dim">No standard fields on this row.</p>
+                )}
+                {t && (
+                  <div className="flex items-start gap-3 text-xs">
+                    <span className="w-28 shrink-0 text-g-muted uppercase tracking-wide text-[10px] pt-0.5">
+                      captured
+                    </span>
+                    <span className="flex-1 text-g-text" title={t}>
+                      {fmtDate(new Date(t), "yyyy-MM-dd HH:mm:ss 'UTC'")}
+                      <span className="ml-2 text-g-muted">
+                        ({formatDistanceToNow(new Date(t), { addSuffix: true })})
+                      </span>
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {rest.length > 0 && (
+                <div>
+                  <div className="text-[10px] uppercase tracking-wide text-g-muted mb-1.5">
+                    Other fields
+                  </div>
+                  <pre className="text-[11px] font-mono text-g-text bg-g-deep border border-g-border rounded-lg p-3 overflow-x-auto whitespace-pre-wrap break-all">
+                    {JSON.stringify(Object.fromEntries(rest), null, 2)}
+                  </pre>
+                </div>
+              )}
+
+              <p className="text-[11px] text-g-muted leading-relaxed">
+                Resend send history and manual-onboard actions are deferred
+                — they need a new endpoint on admin_api (cross-repo). When
+                that ships, this drawer wires those in the same way
+                BuyerDetail wires the fulfillment timeline.
+              </p>
+            </div>
+          )
+        })()}
+      </Modal>
     </div>
   )
 }
