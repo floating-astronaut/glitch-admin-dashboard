@@ -9,6 +9,7 @@ import Login from './pages/Login'
 // IA's appendix invariants. `system/Today.tsx` replaces it.
 import Today from './pages/system/Today'
 import Infrastructure  from './pages/system/Infrastructure'
+import ServerMap       from './pages/system/ServerMap'
 import Settings        from './pages/system/Settings'
 import ControlCentre   from './pages/system/ControlCentre'
 import UserManagement  from './pages/system/UserManagement'
@@ -100,6 +101,8 @@ export default function App() {
               Customers + Billing relocated to their owning verticals in
               ADMIN-RELOC-1; legacy redirects below preserve bookmarks. */}
           <Route path="system/infrastructure"  element={<Infrastructure />} />
+          <Route path="system/server-map"          element={<ServerMap />} />
+          <Route path="system/server-map/:slug"    element={<ServerMap />} />
           <Route path="system/settings"        element={<Settings />} />
           <Route path="system/control-centre"  element={<ControlCentre />} />
           <Route path="system/users"           element={<UserManagement />} />

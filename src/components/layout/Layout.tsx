@@ -27,6 +27,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/edge/users':      'Edge · Users',
   '/edge/billing':    'Edge · Billing',
   '/system/infrastructure':  'System · Infrastructure',
+  '/system/server-map':      'System · Server Map',
   '/system/settings':        'System · Settings',
   '/system/control-centre':  'System · Control Centre',
   '/system/users':           'System · User Management',

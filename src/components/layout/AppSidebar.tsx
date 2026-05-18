@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Users, CreditCard, Server, Settings, Zap,
-  Sprout, LayoutGrid, ShieldCheck, Target, FileClock,
+  Sprout, LayoutGrid, ShieldCheck, Target, FileClock, Network,
   ChevronsUpDown, LogOut, User,
 } from 'lucide-react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
@@ -76,6 +76,7 @@ const NAV: NavGroup[] = [
     items: [
       { title: 'Today',           url: '/', icon: LayoutDashboard, end: true },
       { title: 'Infrastructure',  url: '/system/infrastructure', icon: Server },
+      { title: 'Server Map',      url: '/system/server-map',     icon: Network },
       { title: 'Control Centre',  url: '/system/control-centre', icon: LayoutGrid },
       { title: 'User Management', url: '/system/users', icon: ShieldCheck },
       { title: 'Audit Logs',      url: '/system/audit-logs', icon: FileClock },

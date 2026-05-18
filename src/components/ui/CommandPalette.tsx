@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/command'
 import {
   LayoutDashboard, Sprout, Target, Users, CreditCard, Server,
-  LayoutGrid, ShieldCheck, FileClock, Settings,
+  LayoutGrid, ShieldCheck, FileClock, Network, Settings,
 } from 'lucide-react'
 
 interface Cmd {
@@ -36,6 +36,7 @@ const COMMANDS: Cmd[] = [
   { group: 'Edge',   label: 'Edge · Billing',       to: '/edge/billing',        icon: CreditCard },
   { group: 'System', label: 'Today',                to: '/',                    icon: LayoutDashboard },
   { group: 'System', label: 'Infrastructure',       to: '/system/infrastructure', icon: Server },
+  { group: 'System', label: 'Server Map',           to: '/system/server-map',     icon: Network },
   { group: 'System', label: 'Control Centre',       to: '/system/control-centre', icon: LayoutGrid },
   { group: 'System', label: 'User Management',      to: '/system/users',        icon: ShieldCheck },
   { group: 'System', label: 'Audit Logs',           to: '/system/audit-logs',   icon: FileClock },
