@@ -9,6 +9,7 @@ import "./globals.css";
 
 import { ActiveThemeProvider } from "@/components/active-theme";
 import { DEFAULT_THEME } from "@/lib/themes";
+import QueryProvider from "@/components/providers/query-provider";
 
 // Static export: no server-side cookie reads. Theme preferences are
 // applied client-side by ActiveThemeProvider (localStorage-backed),
@@ -31,7 +32,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange>
           <ActiveThemeProvider initialTheme={DEFAULT_THEME}>
-            {children}
+            <QueryProvider>{children}</QueryProvider>
             <NextTopLoader color="var(--primary)" showSpinner={false} height={2} shadow-sm="none" />
             {process.env.NODE_ENV === "production" ? <GoogleAnalyticsInit /> : null}
           </ActiveThemeProvider>

@@ -85,7 +85,7 @@ export const navItems: NavGroup[] = [
     items: [
       { title: 'Today',           href: '#',                              icon: LayoutDashboardIcon, isComing: true },
       { title: 'Infrastructure',  href: '#',                              icon: ServerIcon,          isComing: true },
-      { title: 'Server Map',      href: '#',                              icon: NetworkIcon,         isComing: true },
+      { title: 'Server Map',      href: '/dashboard/system/server-map',   icon: NetworkIcon },
       { title: 'Control Centre',  href: '#',                              icon: LayoutGridIcon,      isComing: true },
       { title: 'User Management', href: '#',                              icon: ShieldCheckIcon,     isComing: true },
       { title: 'Audit Logs',      href: '#',                              icon: FileClockIcon,       isComing: true },
