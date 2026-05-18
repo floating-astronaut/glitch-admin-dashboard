@@ -57,7 +57,7 @@ function LoginForm() {
     try {
       const res = await login(email, password)
       storeLogin(res.access_token, res.user)
-      const target = from && from !== '/dashboard/login' ? decodeURIComponent(from) : '/dashboard/sales'
+      const target = from && from !== '/dashboard/login' ? decodeURIComponent(from) : '/dashboard'
       router.replace(target)
     } catch (err: unknown) {
       const msg = err && typeof err === 'object' && 'response' in err

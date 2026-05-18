@@ -17,8 +17,6 @@
  * the full IA shape immediately while the pages catch up.
  */
 import {
-  ActivityIcon,
-  BarChart3Icon,
   CreditCardIcon,
   FileClockIcon,
   GaugeIcon,
@@ -92,17 +90,6 @@ export const navItems: NavGroup[] = [
       { title: 'User Management', href: '#',                              icon: ShieldCheckIcon,     isComing: true },
       { title: 'Audit Logs',      href: '#',                              icon: FileClockIcon,       isComing: true },
       { title: 'Settings',        href: '#',                              icon: SettingsIcon,        isComing: true },
-    ],
-  },
-  {
-    // Kit-shipped surfaces — kept as ad-hoc landing reports until
-    // they're absorbed into the per-vertical pages. Sales is the
-    // default post-login destination (see lib/stores/auth + the
-    // login page redirect).
-    title: 'Reports (from kit)',
-    items: [
-      { title: 'Sales',             href: '/dashboard/sales',             icon: BarChart3Icon },
-      { title: 'Website Analytics', href: '/dashboard/website-analytics', icon: ActivityIcon, isNew: true },
     ],
   },
 ]
