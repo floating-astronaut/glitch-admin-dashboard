@@ -13,7 +13,54 @@ Body text (if present) shown as indented sub-bullets.
 
 ## 2026-05-18
 
-- **14:15 UTC** — auto-sync: 2026-05-18 14:15 UTC (`335f05c`) — 3 files
+- **14:45 UTC** — auto-sync: 2026-05-18 14:45 UTC (`c205322`) — 2 files
+        A	app/dashboard/(auth)/system/audit-logs/page.tsx
+        A	components/audit/audit-entry-sheet.tsx
+- **14:39 UTC** — feat(ADMIN-V2-DOMAIN-3): Grow › Customers (Buyers + Leads + detail sheets) (`20f53c1`) — 7 files
+    Largest live-data port of step 5. Backend already ships:
+    admin_api /api/customers/* (buyers list, buyer detail, leads,
+    plus the mutation endpoints we visibly stub for DOMAIN-3.5).
+    Routes
+      /dashboard/grow/customers           Buyers list (default tab)
+      /dashboard/grow/customers/leads     Vibe Kit lead aggregate
+    Shared shell
+      app/dashboard/(auth)/grow/customers/layout.tsx
+        Server component. Renders header (Users icon + title +
+        subtitle) and the tab strip.
+- **14:32 UTC** — fix(ADMIN-V2-LAYOUT): move system/* pages into (auth) route group (`8e06566`) — 2 files
+    Screenshot bug: /dashboard/system/today rendered without sidebar +
+    header. Root cause: I created the routes at app/dashboard/system/*
+    instead of app/dashboard/(auth)/system/* — Next.js route groups are
+    the layout boundary, and (auth)/layout.tsx is what wraps pages in
+    SidebarProvider + AppSidebar + SiteHeader + AuthGuard.
+    Side effect of the bug: pages also bypassed AuthGuard, so they'd
+    render to anyone hitting the URL (though admin_api calls would still
+    401 without a token).
+    Move (URL-preserving — route groups don't affect URLs):
+      app/dashboard/system/  →  app/dashboard/(auth)/system/
+- **14:24 UTC** — feat(ADMIN-V2-DOMAIN-2): System › Today at /dashboard/system/today (`956ce2d`) — 4 files
+    Replaces the placeholder /dashboard welcome with a real cross-surface
+    operator snapshot. /dashboard now meta-refreshes to /system/today.
+    app/dashboard/system/today/page.tsx
+      Composition (top → bottom):
+        Header   System › Today · "Cross-surface ops snapshot"
+        KPIs (4) Trade · MRR (from /api/trade-admin/metrics)
+                 Grow · Buyers (from /api/customers/buyers, count only)
+                 Edge · Status (from /api/edge/healthz via CF Pages proxy)
+                 Alerts (from /api/dashboard/alerts, filtered)
+        Alerts strip — only admin-scoped (trade_engine_* + Ouroboros-
+- **14:17 UTC** — feat(ADMIN-V2-DOMAIN-1): Server Map page live at /dashboard/system/server-map (`4d5745e`) — 4 files
+    First domain port of step 5. Backend (admin_api infra_docs table +
+    endpoints + 5-min sync from /home/support/glitch-trade-app/docs/
+    SERVER_*.md) was shipped in ADMIN-INFRA-1a; this is the SPA surface
+    on the v2 (Next.js + bundui kit) shell.
+    New files
+      components/providers/query-provider.tsx
+        Client-side QueryClientProvider. Wraps every domain page via
+        app/layout.tsx. Defaults tuned for the operator console:
+        30 s staleTime, refetchOnWindowFocus off, retry once. Will be
+        reused by every step-5 port.
+- **14:15 UTC** — auto-sync: 2026-05-18 14:15 UTC (`95ae1fe`) — 4 files
         A	components/providers/query-provider.tsx
         M	package.json
         M	pnpm-lock.yaml
