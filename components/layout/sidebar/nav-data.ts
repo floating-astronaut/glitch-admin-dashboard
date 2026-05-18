@@ -56,10 +56,10 @@ export const navItems: NavGroup[] = [
   {
     title: 'Trade · Business',
     items: [
-      { title: 'Revenue',       href: '#', icon: LayoutDashboardIcon, isComing: true },
-      { title: 'Users',         href: '#', icon: UsersIcon,           isComing: true },
-      { title: 'Subscriptions', href: '#', icon: CreditCardIcon,      isComing: true },
-      { title: 'Billing',       href: '/dashboard/trade/billing', icon: CreditCardIcon },
+      { title: 'Revenue',       href: '/dashboard/trade/revenue',       icon: LayoutDashboardIcon },
+      { title: 'Users',         href: '/dashboard/trade/users',         icon: UsersIcon },
+      { title: 'Subscriptions', href: '/dashboard/trade/subscriptions', icon: CreditCardIcon },
+      { title: 'Billing',       href: '/dashboard/trade/billing',       icon: CreditCardIcon },
     ],
   },
   {
