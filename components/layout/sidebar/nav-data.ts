@@ -66,7 +66,7 @@ export const navItems: NavGroup[] = [
     title: 'Grow',
     items: [
       { title: 'Overview',  href: '#', icon: SproutIcon,       isComing: true },
-      { title: 'Customers', href: '#', icon: ShoppingCartIcon, isComing: true },
+      { title: 'Customers', href: '/dashboard/grow/customers', icon: ShoppingCartIcon },
       { title: 'Users',     href: '#', icon: UsersIcon,        isComing: true },
       { title: 'Billing',   href: '#', icon: CreditCardIcon,   isComing: true },
     ],
