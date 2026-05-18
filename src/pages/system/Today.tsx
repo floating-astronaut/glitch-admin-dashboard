@@ -2,28 +2,34 @@
  * System › Today — the dashboard root.
  *
  * Per docs/ADMIN_IA.md §1: the root (`/`) is the cross-surface
- * System overview. Cross-vertical business snapshot up top + alerts
- * + service heartbeat link + surface-entry grid + recent activity.
+ * System overview. Cross-vertical KPI strip + admin alerts + service
+ * heartbeat link + surface-entry grid + recent admin actions.
  *
  * Strict ownership boundary per the IA's Appendix invariants:
- *   - NO per-vertical business detail (per-tier MRR breakdowns,
- *     customer lists, etc.). Those live under each vertical.
- *   - NO infrastructure detail (CPU / memory / disk progress bars).
- *     Those live under `/system/infrastructure` per the v1.4 IA
- *     dedup pass; we only show a one-line service-up summary here.
- *   - NO Trade-engine internals. Engine surfaces were removed from
- *     the admin dashboard in ADMIN-TRIM-1; they live in the Trade
- *     app itself.
+ *   - NO per-vertical business detail. Those live under each vertical.
+ *   - NO infrastructure detail. CPU / memory / disk live at
+ *     `/system/infrastructure` per the v1.4 dedup.
+ *   - NO Trade-engine internals. Engine surfaces were removed in
+ *     ADMIN-TRIM-1. Alerts coming from admin_api `/api/dashboard/alerts`
+ *     are filtered client-side here to drop `trade_engine_*` types
+ *     (the upstream still emits Ouroboros health alerts; that's a
+ *     cross-repo fix on admin_api/routers/dashboard.py — not in
+ *     scope for the dashboard rework lane).
+ *   - NO `getActivity` feed. The upstream endpoint reads from
+ *     `ml_trades` and surfaces trade_close events from Trade-engine
+ *     bots — exactly the relic that ADMIN-TRIM-1 dropped. Replaced
+ *     here with `getAuditLog` so the "Recent activity" section shows
+ *     admin/operator actions instead.
  */
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import {
   Activity, AlertCircle, ArrowRight, BarChart3, Bot, CreditCard,
-  LayoutGrid, RefreshCw, Server, ShoppingCart, Target,
+  FileClock, LayoutGrid, RefreshCw, Server, ShoppingCart, Target,
   type LucideIcon,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import { getAlerts, getActivity, getServices } from '../../api/endpoints'
+import { getAlerts, getAuditLog, getServices } from '../../api/endpoints'
 import { getTradeMetrics } from '../../api/tradeAdmin'
 import { customersBuyers, customersLeads } from '../../api/grow'
 import { edgeHealthz } from '../../api/edge'
@@ -33,6 +39,7 @@ import Card from '../../components/ui/Surface'
 import DataTable, { Column } from '../../components/ui/DataTable'
 
 interface Alert {
+  type?: string
   message: string
   severity: 'critical' | 'warning' | string
 }
@@ -42,12 +49,14 @@ interface ServiceRow {
   status: string
 }
 
-interface ActivityRow {
-  type: string
-  customer?: string
-  symbol?: string
-  action?: string
-  created_at?: string
+interface AuditEntry {
+  id: number
+  admin_email: string | null
+  action: string
+  target_type: string | null
+  target_id: string | null
+  ip_address: string | null
+  created_at: string
 }
 
 function VerticalCard({
@@ -81,6 +90,18 @@ function fmtMoney(n: number) {
   return `$${n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
 }
 
+// Drop alerts that belong to Trade-engine internals — the upstream
+// admin_api router still emits them but the admin dashboard no longer
+// carries those surfaces (ADMIN-TRIM-1, IA v1.4).
+function isAdminScopedAlert(a: Alert): boolean {
+  const t = (a.type ?? '').toLowerCase()
+  if (t.startsWith('trade_engine')) return false
+  // Defensive: also drop by message if the type is missing.
+  const m = a.message.toLowerCase()
+  if (m.includes('ouroboros') || m.includes('trade engine')) return false
+  return true
+}
+
 export default function Today() {
   // Cross-vertical business snapshots — one-line read per surface.
   const tradeQ = useQuery({
@@ -108,50 +129,63 @@ export default function Today() {
     retry: 1,
   })
 
-  // Platform health — one-line service summary; full metrics live at
-  // /system/infrastructure (no CPU/mem/disk bars duplicated here).
-  const { data: alerts = [] } = useQuery<Alert[]>({
+  // Platform health — alerts (filtered) + one-line service summary.
+  const { data: rawAlerts = [] } = useQuery<Alert[]>({
     queryKey: ['alerts'],
     queryFn: getAlerts,
     refetchInterval: 30_000,
   })
+  const alerts = rawAlerts.filter(isAdminScopedAlert)
   const { data: services = [], isLoading: svcLoading } = useQuery<ServiceRow[]>({
     queryKey: ['services'],
     queryFn: getServices,
     refetchInterval: 30_000,
   })
-  const { data: activity = [], isLoading: actLoading } = useQuery<ActivityRow[]>({
-    queryKey: ['activity'],
-    queryFn: getActivity,
-    refetchInterval: 15_000,
+
+  // Recent admin/operator actions — replaces the old trade-engine
+  // activity feed (ml_trades) that ADMIN-TRIM-1 dropped from scope.
+  const auditQ = useQuery<{ total: number; entries: AuditEntry[] }>({
+    queryKey: ['today:audit'],
+    queryFn: () => getAuditLog(1, 10),
+    refetchInterval: 30_000,
   })
 
   const upCount   = services.filter(s => s.status === 'active' || s.status === 'running').length
   const totalSvc  = services.length
   const downSvc   = services.filter(s => s.status === 'failed' || s.status === 'inactive')
 
-  const activityCols: Column<ActivityRow>[] = [
+  const auditCols: Column<AuditEntry>[] = [
     {
-      key: 'type', label: 'Type',
-      render: r => <span className="text-xs font-mono text-g-muted">{r.type}</span>,
+      key: 'created_at', label: 'Time',
+      render: r => (
+        <span title={r.created_at} className="text-xs text-g-muted whitespace-nowrap">
+          {formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}
+        </span>
+      ),
     },
     {
-      key: 'customer', label: 'Source',
-      render: r => <span className="capitalize text-white">{r.customer ?? '—'}</span>,
-    },
-    {
-      key: 'symbol', label: 'Symbol',
-      render: r => <span className="font-mono text-xs text-g-text">{r.symbol || '—'}</span>,
+      key: 'admin_email', label: 'Actor',
+      render: r => r.admin_email
+        ? <span className="font-mono text-xs text-g-text">{r.admin_email}</span>
+        : <span className="text-g-dim text-xs">system</span>,
     },
     {
       key: 'action', label: 'Action',
-      render: r => <span className="text-xs text-g-muted">{r.action ?? '—'}</span>,
+      render: r => (
+        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/30">
+          {r.action}
+        </span>
+      ),
     },
     {
-      key: 'created_at', label: 'Time',
-      render: r => r.created_at
-        ? formatDistanceToNow(new Date(r.created_at), { addSuffix: true })
-        : '—',
+      key: 'target', label: 'Target',
+      render: r => r.target_type
+        ? (
+          <span className="text-xs font-mono text-g-text">
+            {r.target_type}{r.target_id ? ` · ${r.target_id}` : ''}
+          </span>
+        )
+        : <span className="text-g-dim text-xs">—</span>,
     },
   ]
 
@@ -165,16 +199,15 @@ export default function Today() {
           Cross-surface ops snapshot
         </h1>
         <p className="mt-0.5 text-xs text-g-muted">
-          One-line read per vertical (Trade · Grow · Edge), active alerts,
-          and recent activity. Infrastructure detail (CPU / memory / disk,
-          per-service state) lives at{' '}
+          One-line read per vertical (Trade · Grow · Edge), active admin
+          alerts, and recent admin actions. Infrastructure detail
+          (CPU / memory / disk, per-service state) lives at{' '}
           <Link to="/system/infrastructure" className="text-accent hover:underline">/system/infrastructure</Link>.
         </p>
       </div>
 
       {/* Cross-vertical business snapshot — one KPI card per surface,
-          plus a System alert counter. Sources are the same APIs each
-          owning surface reads from, so numbers stay in sync. */}
+          plus a System alert counter. */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
           label="Trade · MRR"
@@ -211,7 +244,8 @@ export default function Today() {
         />
       </div>
 
-      {/* Alerts strip (cross-product) */}
+      {/* Admin-scoped alerts strip — trade-engine alerts are filtered
+          out client-side; the upstream admin_api still emits them. */}
       {alerts.length > 0 && (
         <div className="space-y-2">
           {alerts.map((alert, i) => (
@@ -295,15 +329,34 @@ export default function Today() {
         </div>
       </Section>
 
-      {/* Recent activity */}
-      <Section title="Recent activity">
-        <DataTable
-          columns={activityCols}
-          data={activity}
-          loading={actLoading}
-          emptyText="No recent activity"
-          dateField="created_at"
-        />
+      {/* Recent admin actions — sourced from /api/settings/audit, NOT
+          /api/dashboard/activity (the latter reads ml_trades and would
+          surface stale Trade-engine events). */}
+      <Section title="Recent admin actions">
+        {auditQ.isError ? (
+          <Card>
+            <p className="text-xs text-red-400">
+              Couldn't load audit feed. <code className="font-mono">/api/settings/audit</code> returned an error.
+            </p>
+          </Card>
+        ) : (
+          <>
+            <DataTable
+              columns={auditCols}
+              data={auditQ.data?.entries ?? []}
+              loading={auditQ.isLoading}
+              emptyText="No admin actions in range"
+            />
+            <div className="flex justify-end mt-2">
+              <Link
+                to="/system/audit-logs"
+                className="inline-flex items-center gap-1 text-[11px] text-g-muted hover:text-accent"
+              >
+                <FileClock size={11} /> full audit log <ArrowRight size={10} />
+              </Link>
+            </div>
+          </>
+        )}
       </Section>
 
       {/* Footer note — surface boundary reminder */}

@@ -13,7 +13,31 @@ Body text (if present) shown as indented sub-bullets.
 
 ## 2026-05-18
 
-- **03:30 UTC** — auto-sync: 2026-05-18 03:30 UTC (`1eedfb8`) — 8 files
+- **03:48 UTC** — auto-sync: 2026-05-18 03:48 UTC (`081b740`) — 1 file
+        M	src/pages/system/Today.tsx
+- **03:39 UTC** — feat(ADMIN-DETAILS-1): audit + lead detail drawers (deferred → done) (`bee11db`) — 3 files
+    Closes the last actionable ADMIN-family lane: the audit-entry +
+    lead-row detail surfaces that were marked v1-deferred in
+    docs/customer-mgmt-design.md. Pure UI — no backend work.
+    Modal primitive
+      src/components/ui/Modal.tsx
+        Added a `size` prop ('sm' | 'md' | 'lg' | 'xl') to widen the
+        primitive for detail views. Existing default stays at md so
+        behaviour is unchanged for any future consumer. Layout switched
+        to flex column with max-h-[85vh] so detail bodies scroll inside
+        the modal instead of overflowing the viewport.
+- **03:34 UTC** — refactor(ADMIN-SETTINGS-1): single-purpose Settings (drop duplicate Users/Audit tabs) (`1c23a4a`) — 1 file
+    Continuation of the KPI-1 dedup theme: /system/settings still carried
+    three tabs — Users / Audit / Environment — where Users duplicated
+    /system/users (UserManagement) and Audit duplicated /system/audit-logs
+    (AuditLogs). Both surfaces have had dedicated pages since ADMIN-1b.
+    src/pages/system/Settings.tsx
+      Was 224 LOC with tab navigation + admin-user list + Add User modal
+      + audit log table + env status. Cut to ~95 LOC, single-purpose:
+      environment-variable presence flags only.
+      Added a small KPI strip (Tracked vars / Present / Missing) so the
+      page has the same shape as the rest of the dashboard.
+- **03:30 UTC** — auto-sync: 2026-05-18 03:30 UTC (`6f32e43`) — 9 files
         M	src/pages/edge/Betting.tsx
         M	src/pages/edge/Billing.tsx
         M	src/pages/edge/Users.tsx
