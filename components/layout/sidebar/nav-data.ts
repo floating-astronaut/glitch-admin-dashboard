@@ -43,6 +43,10 @@ export type NavLeaf = {
   isDataBadge?: string
   isNew?: boolean
   newTab?: boolean
+  // Optional nested sub-items — the kit's NavMain renders a dropdown
+  // when present. None of our v1.4 IA items use this, but the field
+  // is here for structural compatibility with NavMain.tsx.
+  items?: NavLeaf[]
 }
 
 export type NavGroup = {

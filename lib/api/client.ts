@@ -4,20 +4,16 @@ import { useAuthStore } from '../stores/auth'
 /**
  * API base URL.
  *
- * Old setup (pre-CF Pages): dashboard SPA + admin_api both lived behind
- * one nginx vhost (dashboard.glitchexecutor.com), so baseURL was '' and
- * everything was same-origin.
+ * CF Pages SPA at dashboard.glitchexecutor.com talks to admin_api
+ * cross-origin at admin-api.glitchexecutor.com (nginx → docker-bound
+ * 127.0.0.1:5004). Auth is JWT bearer in a header, not a cookie, so
+ * no withCredentials needed.
  *
- * Now (CF Pages): SPA is served from Cloudflare's edge at
- * dashboard.glitchexecutor.com but admin_api still runs on this server,
- * so the SPA talks to it cross-origin at admin-api.glitchexecutor.com
- * (nginx vhost → docker-bound 127.0.0.1:5004). Auth is JWT bearer in a
- * header, not a cookie, so no withCredentials needed.
- *
- * Override via VITE_API_BASE at build time if you need a different
- * upstream (e.g. local dev pointing at staging admin_api).
+ * Override via NEXT_PUBLIC_API_BASE at build time for staging /
+ * port-forward dev. (v1 used VITE_API_BASE — renamed in the
+ * v2 swap to bundui kit.)
  */
-export const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, '')
+export const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? '').replace(/\/$/, '')
   || 'https://admin-api.glitchexecutor.com'
 
 const api = axios.create({
@@ -38,7 +34,10 @@ api.interceptors.response.use(
   (err) => {
     if (err.response?.status === 401) {
       useAuthStore.getState().logout()
-      window.location.href = '/login'
+      // window is undefined during Next.js SSR; gate the redirect.
+      if (typeof window !== 'undefined') {
+        window.location.href = '/dashboard/login'
+      }
     }
     return Promise.reject(err)
   }

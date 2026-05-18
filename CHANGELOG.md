@@ -13,7 +13,14 @@ Body text (if present) shown as indented sub-bullets.
 
 ## 2026-05-18
 
-- **12:45 UTC** — auto-sync: 2026-05-18 12:45 UTC (`87d8e6e`) — 8 files
+- **13:00 UTC** — auto-sync: 2026-05-18 13:00 UTC (`48c6b22`) — 7 files
+        D	app/dashboard/(guest)/login/v2/page.tsx
+        M	components/layout/header/search.tsx
+        M	components/layout/sidebar/nav-data.ts
+        M	lib/api/client.ts
+        M	package.json
+        ... (+2 more)
+- **12:45 UTC** — auto-sync: 2026-05-18 12:45 UTC (`aa051d1`) — 9 files
         M	app/dashboard/(auth)/layout.tsx
         A	app/dashboard/(guest)/login/page.tsx
         D	app/dashboard/(guest)/login/v1/page.tsx
