@@ -13,7 +13,69 @@ Body text (if present) shown as indented sub-bullets.
 
 ## 2026-05-18
 
-- **14:45 UTC** — auto-sync: 2026-05-18 14:45 UTC (`c205322`) — 2 files
+- **15:30 UTC** — auto-sync: 2026-05-18 15:30 UTC (`a415d52`) — 2 files
+        A	app/dashboard/(auth)/system/control-centre/page.tsx
+        M	components/layout/sidebar/nav-data.ts
+- **15:19 UTC** — feat(ADMIN-V2-DOMAIN-8): Infrastructure live at /dashboard/system/infrastructure (`873b51e`) — 2 files
+    Service heartbeat board. Live data from admin_api /api/infra:
+      GET /api/infra/services   docker containers (TARGET_CONTAINERS:
+                                glitch-postgres / -redis / -payment /
+                                -admin-api / -dashboard / -docker-proxy)
+                                + host pseudo-service glitch-ml-collector
+                                (state inferred from ml_signals freshness).
+      GET /api/infra/system     psutil CPU / memory / disk.
+    Page (app/dashboard/(auth)/system/infrastructure/page.tsx)
+      Host metrics strip   3 progress-bar cards (CPU / Memory / Disk)
+                           with tone-by-threshold (emerald < 70%,
+- **15:09 UTC** — feat(ADMIN-V2-DOMAIN-7): User Management live at /dashboard/system/users (`213e510`) — 3 files
+    Admin/operator account CRUD. Wired to admin_api /api/settings/users:
+      GET    list admins
+      POST   create (via Sheet drawer)
+      PATCH  toggle role + is_active inline on the row
+    Pages
+      app/dashboard/(auth)/system/users/page.tsx
+        Live table: email · role select · active switch · last login
+        (relative) · created (relative). Inline role + active mutations
+        invalidate the list query. "New admin user" button opens the
+        drawer.
+- **15:02 UTC** — feat(ADMIN-V2-DOMAIN-6): 7 preview shells (Grow + Edge); IA fully reachable (`640e22c`) — 5 files
+    Closes the sidebar IA — every v1.4-locked nav item now leads to a
+    real page instead of href="#". Six are preview shells (EmptyState +
+    KPI placeholders that name the upstream backend they're waiting on);
+    one (Edge Overview) wires real live data via the existing CF Pages
+    proxy to edge-api.
+    New routes
+      /dashboard/grow            Grow overview — surface grid + KPI strip
+                                 with live Customers + Leads counts.
+      /dashboard/grow/users      preview shell — awaits Grow operator API.
+      /dashboard/grow/billing    preview shell — no paid Grow customers yet.
+- **15:00 UTC** — auto-sync: 2026-05-18 15:00 UTC (`5fd56f2`) — 3 files
+        A	app/dashboard/(auth)/grow/billing/page.tsx
+        A	app/dashboard/(auth)/grow/page.tsx
+        A	app/dashboard/(auth)/grow/users/page.tsx
+- **14:57 UTC** — feat(ADMIN-V2-DOMAIN-5): Trade · Billing live at /dashboard/trade/billing (`cdb7e20`) — 2 files
+    First live Trade · Business surface. Wired to admin_api /api/billing/*:
+      GET /api/billing/summary       MRR / ARR / total_active / total_trial
+      GET /api/billing/plans         plan catalogue + subscriber counts
+      GET /api/billing/email-signups paginated, date-filterable
+    Composition (top → bottom)
+      Header   CreditCard icon + "Trade · Billing" subtitle.
+      KPIs (4) MRR (accent + ARR sub), ARR, Active subscribers,
+               Trial users. Auto-refresh 60 s.
+      Plans    3 tier cards (starter/pro/elite) with tier-coloured
+               borders. Each shows price/mo, price/yr, subscriber
+- **14:46 UTC** — feat(ADMIN-V2-DOMAIN-4): Audit Logs + Settings live (`6fa0299`) — 2 files
+    /dashboard/system/audit-logs
+      Wired to admin_api GET /api/settings/audit (audit_log joined to
+      admin_users for actor email). Paginated (20/50/100 row sizes),
+      date-range filterable. Auto-refresh 60 s.
+      Click row → AuditEntrySheet drawer with structured fields up top
+      (when, actor, action pill, target, IP) + pretty-printed JSON
+      details. Sheet handles string-or-object details defensively.
+    /dashboard/system/settings
+      Three sections:
+        Upstream APIs   live reachability probes (admin_api /health,
+- **14:45 UTC** — auto-sync: 2026-05-18 14:45 UTC (`566313a`) — 3 files
         A	app/dashboard/(auth)/system/audit-logs/page.tsx
         A	components/audit/audit-entry-sheet.tsx
 - **14:39 UTC** — feat(ADMIN-V2-DOMAIN-3): Grow › Customers (Buyers + Leads + detail sheets) (`20f53c1`) — 7 files
