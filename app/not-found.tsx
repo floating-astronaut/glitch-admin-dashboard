@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
+export const runtime = 'edge'
+
 export default function NotFound() {
   return (
     <div className="bg-background grid h-screen items-center pb-8 lg:grid-cols-2 lg:pb-0">

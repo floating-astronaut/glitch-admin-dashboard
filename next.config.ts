@@ -3,10 +3,10 @@ import { config } from "dotenv";
 
 config();
 
-const isProduction = process.env.NODE_ENV === "production";
-
+// Kit's demo `assetPrefix` was pointed at the bundui showcase CDN
+// (https://dashboard.shadcnuikit.com); removed in the v2 swap so
+// assets resolve against our own deploy (dashboard.glitchexecutor.com).
 const nextConfig: NextConfig = {
-  assetPrefix: isProduction ? "https://dashboard.shadcnuikit.com" : undefined,
   images: {
     remotePatterns: [
       {

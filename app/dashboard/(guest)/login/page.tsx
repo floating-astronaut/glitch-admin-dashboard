@@ -19,6 +19,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { login } from '@/lib/api/endpoints'
 import { useAuthStore } from '@/lib/stores/auth'
 
+export const runtime = 'edge'
+
 const ADMIN_EMAIL = 'admin@glitchexecutor.com'
 
 export default function LoginPage() {

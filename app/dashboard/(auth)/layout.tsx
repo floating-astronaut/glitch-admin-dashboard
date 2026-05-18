@@ -6,6 +6,8 @@ import { AppSidebar } from "@/components/layout/sidebar/app-sidebar";
 import { SiteHeader } from "@/components/layout/header";
 import AuthGuard from "@/components/auth/AuthGuard";
 
+export const runtime = 'edge'
+
 export default async function AuthLayout({
   children
 }: Readonly<{
