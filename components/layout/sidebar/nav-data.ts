@@ -65,19 +65,19 @@ export const navItems: NavGroup[] = [
   {
     title: 'Grow',
     items: [
-      { title: 'Overview',  href: '#', icon: SproutIcon,       isComing: true },
+      { title: 'Overview',  href: '/dashboard/grow', icon: SproutIcon },
       { title: 'Customers', href: '/dashboard/grow/customers', icon: ShoppingCartIcon },
-      { title: 'Users',     href: '#', icon: UsersIcon,        isComing: true },
-      { title: 'Billing',   href: '#', icon: CreditCardIcon,   isComing: true },
+      { title: 'Users',     href: '/dashboard/grow/users',    icon: UsersIcon },
+      { title: 'Billing',   href: '/dashboard/grow/billing',  icon: CreditCardIcon },
     ],
   },
   {
     title: 'Edge',
     items: [
-      { title: 'Overview', href: '#', icon: LayoutDashboardIcon, isComing: true },
-      { title: 'Betting',  href: '#', icon: TargetIcon,          isComing: true },
-      { title: 'Users',    href: '#', icon: UsersIcon,           isComing: true },
-      { title: 'Billing',  href: '#', icon: CreditCardIcon,      isComing: true },
+      { title: 'Overview', href: '/dashboard/edge',         icon: LayoutDashboardIcon },
+      { title: 'Betting',  href: '/dashboard/edge/betting', icon: TargetIcon },
+      { title: 'Users',    href: '/dashboard/edge/users',   icon: UsersIcon },
+      { title: 'Billing',  href: '/dashboard/edge/billing', icon: CreditCardIcon },
     ],
   },
   {
