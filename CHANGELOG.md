@@ -13,7 +13,25 @@ Body text (if present) shown as indented sub-bullets.
 
 ## 2026-05-18
 
-- **13:30 UTC** — auto-sync: 2026-05-18 13:30 UTC (`8f5688e`) — 59 files
+- **13:45 UTC** — auto-sync: 2026-05-18 13:45 UTC (`34d378c`) — 9 files
+        M	app/dashboard/(auth)/layout.tsx
+        M	app/dashboard/(auth)/sales/page.tsx
+        M	app/dashboard/(auth)/website-analytics/page.tsx
+        M	app/dashboard/(guest)/layout.tsx
+        M	app/dashboard/(guest)/login/page.tsx
+        ... (+4 more)
+- **13:37 UTC** — fix(ADMIN-V2-DEPLOY): prune unreachable kit surfaces; trim heavy deps (`a3322a6`) — 3 files
+    Step toward a green CF Pages deploy. Earlier deploy attempt (after
+    the runtime/proxy/asset-prefix fixes) compiled cleanly but the
+    @cloudflare/next-on-pages worker bundle was 13.55 MiB — well over
+    the free-tier 3 MiB cap. The biggest function chunk was
+    website-analytics at 6.4 MiB.
+    Trimmed (not reachable from any of our 5 active routes — /, /dashboard,
+    /dashboard/login, /dashboard/sales, /dashboard/website-analytics)
+      Kit components deleted (mechanical, none imported by active routes):
+        components/ui/{carousel,kanban,calendar,menubar,context-menu,
+                       navigation-menu,resizable,drawer,hover-card,
+- **13:30 UTC** — auto-sync: 2026-05-18 13:30 UTC (`6ad7912`) — 60 files
         M	app/layout.tsx
         D	components/date-time-picker.tsx
         D	components/ui/aspect-ratio.tsx

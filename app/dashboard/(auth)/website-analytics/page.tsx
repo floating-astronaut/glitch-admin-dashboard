@@ -13,8 +13,6 @@ import { TotalEarningCard } from "./components/total-earning-card";
 import { MonthlyCampaignStateCard } from "./components/monthly-campaign-state";
 import { StatCards } from "./components/stat-cards";
 
-export const runtime = 'edge'
-
 export async function generateMetadata() {
   return generateMeta({
     title: "Website Analytics Admin Dashboard",

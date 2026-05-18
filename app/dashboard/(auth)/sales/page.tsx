@@ -12,8 +12,6 @@ import { BestSellingProducts } from "./components/best-selling-products";
 import { TableOrderStatus } from "./components/table-order-status";
 import { RevenueChart } from "./components/revenue-chart";
 
-export const runtime = 'edge'
-
 export async function generateMetadata() {
   return generateMeta({
     title: "Sales Admin Dashboard",

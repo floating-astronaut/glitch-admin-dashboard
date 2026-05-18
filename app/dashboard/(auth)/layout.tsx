@@ -1,26 +1,24 @@
 import React from "react";
-import { cookies } from "next/headers";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/sidebar/app-sidebar";
 import { SiteHeader } from "@/components/layout/header";
 import AuthGuard from "@/components/auth/AuthGuard";
 
-export const runtime = 'edge'
+// Static export: no server-side cookie reads. The kit used `cookies()`
+// to avoid theme flash on first paint; with `output: 'export'` we
+// accept a brief flash and let ActiveThemeProvider (client component,
+// localStorage-backed) settle the theme on hydration. Sidebar
+// defaultOpen falls back to true.
 
-export default async function AuthLayout({
+export default function AuthLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const defaultOpen =
-    cookieStore.get("sidebar_state")?.value === "true" ||
-    cookieStore.get("sidebar_state") === undefined;
-
   return (
     <SidebarProvider
-      defaultOpen={defaultOpen}
+      defaultOpen={true}
       style={
         {
           "--sidebar-width": "calc(var(--spacing) * 64)",
