@@ -8,7 +8,7 @@
  */
 'use client'
 
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { Suspense, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AlertCircle, Zap } from 'lucide-react'
 
@@ -21,7 +21,19 @@ import { useAuthStore } from '@/lib/stores/auth'
 
 const ADMIN_EMAIL = 'admin@glitchexecutor.com'
 
+// Next.js static export bails out of prerender unless every
+// useSearchParams() consumer is wrapped in a Suspense boundary. The
+// page default export is just the boundary; LoginForm is the real
+// component.
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const from = searchParams.get('from')
