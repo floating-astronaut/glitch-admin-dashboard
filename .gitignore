@@ -1,45 +1,48 @@
-# Dependencies
-node_modules/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Build output
-dist/
-build/
-.next/
-out/
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
 
-# Vite
-.vite/
-*.local
+# testing
+/coverage
 
-# Environment / secrets
-.env
-.env.*
-!.env.example
-*.key
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
 *.pem
-*secret*
-*credentials*
 
-# Databases
-*.db
-*.sqlite
-*.sqlite3
-
-# Python (in case of tooling)
-__pycache__/
-*.py[cod]
-venv/
-.venv/
-
-# Logs
-*.log
-logs/
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Editor / OS
-.DS_Store
-.vscode/
-.idea/
-*.swp
+# local env files
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# editor
+.idea
+.vscode
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+.vercel
+
+.cursorrules
+.cursor
+
+.claude
