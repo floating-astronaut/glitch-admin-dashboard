@@ -13,7 +13,25 @@ Body text (if present) shown as indented sub-bullets.
 
 ## 2026-05-18
 
-- **15:30 UTC** — auto-sync: 2026-05-18 15:30 UTC (`a415d52`) — 2 files
+- **21:00 UTC** — auto-sync: 2026-05-18 20:45 UTC (`82d3d10`) — 17 files
+        D	components/layout/header/data.ts
+        M	components/layout/header/index.tsx
+        D	components/layout/header/notifications.tsx
+        M	components/layout/header/user-menu.tsx
+        M	components/layout/logo.tsx
+        ... (+11 more)
+- **15:35 UTC** — feat(ADMIN-V2-DOMAIN-10): Trade preview shells (Revenue/Users/Subscriptions) live (`3705cde`) — 4 files
+    Closes the last 3 Coming Soon items in the v1.4 IA. All 19 sidebar entries
+    now resolve to real routes (no '#' hrefs left, no isComing flags).
+    - /dashboard/trade/revenue       — live MRR/ARR/active/trial from
+                                       admin_api /api/billing/summary; deep
+                                       time-series gated on trade-api
+                                       /v1/admin/revenue.
+    - /dashboard/trade/users         — per-customer view shell; teaser KPIs
+                                       from billing summary; per-row data
+                                       gated on trade-api /v1/admin/users.
+    - /dashboard/trade/subscriptions — per-subscription Stripe row shell;
+- **15:30 UTC** — auto-sync: 2026-05-18 15:30 UTC (`a20df47`) — 3 files
         A	app/dashboard/(auth)/system/control-centre/page.tsx
         M	components/layout/sidebar/nav-data.ts
 - **15:19 UTC** — feat(ADMIN-V2-DOMAIN-8): Infrastructure live at /dashboard/system/infrastructure (`873b51e`) — 2 files

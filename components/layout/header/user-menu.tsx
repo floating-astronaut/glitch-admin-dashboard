@@ -1,83 +1,71 @@
-import { BadgeCheck, Bell, ChevronRightIcon, CreditCard, LogOut, Sparkles } from "lucide-react";
+/**
+ * UserMenu — header right-edge avatar dropdown.
+ *
+ * Reads the signed-in admin from useAuthStore (persist key `glitch-admin-auth`).
+ * Kit-shipped Upgrade-to-Pro / Account / Billing / Notifications / Credits
+ * widget all stripped — this is a single-tenant operator console; only Log
+ * out is wired (clears auth store, bounces to /dashboard/login).
+ */
+'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from 'next/navigation'
+import { LogOut } from 'lucide-react'
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { Progress } from "@/components/ui/progress";
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+import { useAuthStore } from '@/lib/stores/auth'
+
+function initials(email: string): string {
+  const local = (email.split('@')[0] || 'a').replace(/[^a-z0-9]/gi, '')
+  return (local.slice(0, 2) || 'a').toUpperCase()
+}
 
 export default function UserMenu() {
+  const router = useRouter()
+  const user = useAuthStore((s) => s.user)
+  const logout = useAuthStore((s) => s.logout)
+
+  const email = user?.email ?? 'admin@glitchexecutor.com'
+  const role = user?.role ?? 'admin'
+
+  function handleLogout() {
+    logout()
+    router.push('/dashboard/login')
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar>
-          <AvatarImage src={`https://i.pravatar.cc/150?img=1`} alt="shadcn ui kit" />
-          <AvatarFallback className="rounded-lg">TB</AvatarFallback>
+        <Avatar className="cursor-pointer">
+          <AvatarFallback className="rounded-lg">{initials(email)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) min-w-60" align="end">
         <DropdownMenuLabel className="p-0">
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar>
-              <AvatarImage src={`https://i.pravatar.cc/150?img=1`} alt="shadcn ui kit" />
-              <AvatarFallback className="rounded-lg">TB</AvatarFallback>
+              <AvatarFallback className="rounded-lg">{initials(email)}</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">Toby Belhome</span>
-              <span className="text-muted-foreground truncate text-xs">hello@tobybelhome.com</span>
+              <span className="truncate font-medium">{email}</span>
+              <span className="text-muted-foreground truncate text-xs">{role}</span>
             </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href="https://shadcnuikit.com/pricing" target="_blank">
-              <Sparkles /> Upgrade to Pro
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <BadgeCheck />
-            Account
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <CreditCard />
-            Billing
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Bell />
-            Notifications
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
           <LogOut />
           Log out
         </DropdownMenuItem>
-        <div className="bg-muted mt-1.5 rounded-md border">
-          <div className="space-y-3 p-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium">Credits</h4>
-              <div className="text-muted-foreground flex cursor-pointer items-center text-sm">
-                <span>5 left</span>
-                <ChevronRightIcon className="ml-1 h-4 w-4" />
-              </div>
-            </div>
-            <Progress value={40} indicatorColor="bg-primary" />
-            <div className="text-muted-foreground flex items-center text-sm">
-              Daily credits used first
-            </div>
-          </div>
-        </div>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }
