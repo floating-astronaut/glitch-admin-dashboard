@@ -13,3 +13,10 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+// Build-info constants injected by vite.config.ts via `define`.
+// Surfaced on /system/settings so the operator can confirm which
+// build is live without fetching index.html or hitting the box.
+declare const __BUILD_TIMESTAMP__: string
+declare const __BUILD_SHA__: string
+declare const __BUILD_BRANCH__: string
